@@ -11,7 +11,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #f0f2f5; }
 
-    /* ═══ LAYOUT PC — 3 colonnes ═══ */
     .app-desktop {
       display: grid;
       grid-template-columns: 280px 1fr 1fr;
@@ -19,8 +18,6 @@
       max-width: 1400px;
       margin: 0 auto;
     }
-
-    /* ═══ LAYOUT MOBILE — caché par défaut ═══ */
     .app-mobile { display: none; }
 
     @media (max-width: 768px) {
@@ -28,9 +25,6 @@
       .app-mobile { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     }
 
-    /* ══════════════════════════════════════
-       STYLES COMMUNS (PC + mobile)
-    ══════════════════════════════════════ */
     .col-header {
       padding: 16px; font-size: 13px; font-weight: bold;
       letter-spacing: .05em;
@@ -81,7 +75,6 @@
       border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c0392b; margin-top: 8px;
     }
 
-    /* Historique cards */
     .devis-card {
       background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
       border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; transition: background .15s;
@@ -106,7 +99,6 @@
     }
     .btn-suppr-selection.visible { display: block; }
 
-    /* Chat */
     .chat-header { background: #1a1a2e; color: white; padding: 16px 20px; font-size: 15px; font-weight: bold; flex-shrink: 0; }
     .chat-header span { font-size: 12px; opacity: .6; display: block; margin-top: 2px; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -122,7 +114,6 @@
     .btn-envoyer { padding: 10px 16px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; align-self: flex-end; }
     .btn-appliquer { margin-top: 8px; padding: 6px 12px; background: #2d5a3d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
 
-    /* Toast */
     .toast {
       position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
       background: #1a3a5c; color: white; padding: 10px 20px;
@@ -131,9 +122,6 @@
     }
     .toast.show { opacity: 1; }
 
-    /* ══════════════════════════════════════
-       PC UNIQUEMENT
-    ══════════════════════════════════════ */
     .colonne-historique {
       background: #1a1a2e; color: white;
       display: flex; flex-direction: column; height: 100vh; overflow: hidden;
@@ -143,90 +131,38 @@
     .colonne-form { background: white; height: 100vh; overflow-y: auto; padding: 24px; border-right: 1px solid #e0e0e0; }
     .colonne-chat { display: flex; flex-direction: column; height: 100vh; background: #f8f9fa; }
 
-    /* ══════════════════════════════════════
-       MOBILE UNIQUEMENT
-    ══════════════════════════════════════ */
-    .mobile-content {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
-
+    .mobile-content { flex: 1; overflow: hidden; position: relative; }
     .mobile-panel {
-      position: absolute;
-      inset: 0;
-      overflow-y: auto;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .2s;
+      position: absolute; inset: 0; overflow-y: auto;
+      opacity: 0; pointer-events: none; transition: opacity .2s;
     }
+    .mobile-panel.actif { opacity: 1; pointer-events: all; }
+    .mobile-panel.historique { background: #1a1a2e; color: white; padding: 16px; }
+    .mobile-panel.historique h2 { color: rgba(255,255,255,.5); margin-bottom: 12px; }
+    .mobile-panel.formulaire { background: white; padding: 20px 16px 100px; }
+    .mobile-panel.chat { background: #f8f9fa; display: flex; flex-direction: column; }
+    .mobile-panel.chat .chat-messages { flex: 1; padding-bottom: 16px; }
 
-    .mobile-panel.actif {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    /* Panel historique mobile */
-    .mobile-panel.historique {
-      background: #1a1a2e;
-      color: white;
-      padding: 16px;
-    }
-
-    .mobile-panel.historique h2 {
-      color: rgba(255,255,255,.5);
-      margin-bottom: 12px;
-    }
-
-    /* Panel formulaire mobile */
-    .mobile-panel.formulaire {
-      background: white;
-      padding: 20px 16px 100px;
-    }
-
-    /* Panel chat mobile */
-    .mobile-panel.chat {
-      background: #f8f9fa;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mobile-panel.chat .chat-messages {
-      flex: 1;
-      padding-bottom: 16px;
-    }
-
-    /* Barre d'onglets en bas */
     .tab-bar {
-      display: flex;
-      background: white;
-      border-top: 1px solid #e0e0e0;
-      flex-shrink: 0;
-      z-index: 100;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+      display: flex; background: white;
+      border-top: 1px solid #e0e0e0; flex-shrink: 0;
+      z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
     }
-
     .tab-btn {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       padding: 10px 0; border: none; background: transparent;
       cursor: pointer; color: #aaa; transition: color .2s;
-      font-size: 10px; gap: 3px;
+      position: relative; border-top: 3px solid transparent;
     }
-
     .tab-btn .tab-icon { font-size: 22px; line-height: 1; }
     .tab-btn .tab-label { font-size: 10px; font-weight: 500; }
-
-    .tab-btn { position: relative; border-top: 3px solid transparent; }
     .tab-btn.actif { color: #1a1a2e; border-top: 3px solid #1a1a2e; }
     .tab-btn.actif .tab-label { font-weight: 700; }
 
-    /* Header mobile */
     .mobile-header {
-      background: #1a1a2e; color: white;
-      padding: 14px 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-shrink: 0;
+      background: #1a1a2e; color: white; padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
     }
     .mobile-header-title { font-size: 16px; font-weight: bold; }
     .mobile-header-sub { font-size: 11px; opacity: .6; }
@@ -236,17 +172,10 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- ════════════════════════════════════════
-     VERSION PC — 3 colonnes
-════════════════════════════════════════ -->
+<!-- VERSION PC -->
 <div class="app-desktop">
-
-  <!-- Colonne gauche : historique -->
   <div class="colonne-historique">
-    <div class="col-header">
-      📁 Historique
-      <span>Mes devis sauvegardés</span>
-    </div>
+    <div class="col-header">📁 Historique<span>Mes devis sauvegardés</span></div>
     <div class="historique-scroll" id="historiqueDevis">
       <div class="historique-vide">📭 Aucun devis sauvegardé</div>
     </div>
@@ -257,8 +186,7 @@
     </div>
   </div>
 
-  <!-- Colonne milieu : formulaire -->
-  <div class="colonne-form" id="colonne-form-desktop">
+  <div class="colonne-form">
     <h1>📄 DevisApp</h1>
     <div id="form-content-desktop"></div>
     <div id="erreurValidation-desktop" class="msg-erreur" style="display:none;"></div>
@@ -267,12 +195,8 @@
     <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
   </div>
 
-  <!-- Colonne droite : chat -->
   <div class="colonne-chat">
-    <div class="chat-header">
-      🤖 Assistant DevisApp
-      <span>Décris ta prestation ou pose une question juridique</span>
-    </div>
+    <div class="chat-header">🤖 Assistant DevisApp<span>Décris ta prestation ou pose une question juridique</span></div>
     <div class="chat-messages" id="chatMessages">
       <div class="msg assistant">
         Bonjour ! Je suis ton assistant auto-entrepreneur. Je peux :<br><br>
@@ -293,31 +217,18 @@
       <button class="btn-envoyer" onclick="envoyerChat()">➤</button>
     </div>
   </div>
-
 </div>
 
-<!-- ════════════════════════════════════════
-     VERSION MOBILE — onglets
-════════════════════════════════════════ -->
+<!-- VERSION MOBILE -->
 <div class="app-mobile">
-
-  <!-- Header dynamique -->
   <div class="mobile-header">
     <div>
       <div class="mobile-header-title" id="mobileTitle">📄 DevisApp</div>
-      <div class="mobile-header-sub" id="mobileSub">Formulaire</div>
+      <div class="mobile-header-sub" id="mobileSub">Nouveau devis</div>
     </div>
-    <button class="btn-sauvegarder" id="btnSauvegarderMobile"
-      onclick="sauvegarderDevisCloud()"
-      style="width:auto; padding:8px 14px; font-size:13px; margin:0;">
-      ☁️
-    </button>
   </div>
 
-  <!-- Contenu des panels -->
   <div class="mobile-content">
-
-    <!-- Panel Historique -->
     <div class="mobile-panel historique" id="panel-historique">
       <h2>Devis sauvegardés</h2>
       <div id="historiqueDevisMobile">
@@ -330,15 +241,14 @@
       </div>
     </div>
 
-    <!-- Panel Formulaire -->
     <div class="mobile-panel formulaire actif" id="panel-formulaire">
       <div id="form-content-mobile"></div>
       <div id="erreurValidation-mobile" class="msg-erreur" style="display:none;"></div>
-      <button class="btn-principal" onclick="genererDevis()" style="margin-bottom:8px;">📥 Générer PDF</button>
+      <button class="btn-principal" onclick="genererDevis()">📥 Générer PDF</button>
+      <button class="btn-sauvegarder" id="btnSauvegarderMobile" onclick="sauvegarderDevisCloud()" style="margin-top:8px;">☁️ Sauvegarder</button>
       <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
     </div>
 
-    <!-- Panel Chat -->
     <div class="mobile-panel chat" id="panel-chat">
       <div class="chat-messages" id="chatMessagesMobile">
         <div class="msg assistant">
@@ -356,10 +266,8 @@
         <button class="btn-envoyer" onclick="envoyerChatMobile()">➤</button>
       </div>
     </div>
-
   </div>
 
-  <!-- Barre d'onglets -->
   <div class="tab-bar">
     <button class="tab-btn" id="tab-historique" onclick="changerOnglet('historique')">
       <span class="tab-icon">📁</span>
@@ -374,13 +282,11 @@
       <span class="tab-label">Assistant</span>
     </button>
   </div>
-
 </div>
 
 <script>
-  // ══════════════════════════════════════
-  // GÉNÉRATION DU FORMULAIRE (partagé PC + mobile)
-  // ══════════════════════════════════════
+  const isMobile = window.innerWidth <= 768;
+
   function getFormHTML() {
     return `
       <h2>Mes informations</h2>
@@ -441,14 +347,14 @@
     `;
   }
 
-  // Injecter le formulaire dans PC et mobile
-  const isMobile = window.innerWidth <= 768;
-  document.getElementById('form-content-mobile').innerHTML = getFormHTML();
-  document.getElementById('form-content-desktop').innerHTML = getFormHTML();
+  if (isMobile) {
+    document.getElementById('form-content-mobile').innerHTML = getFormHTML();
+  } else {
+    document.getElementById('form-content-desktop').innerHTML = getFormHTML();
+  }
 
   document.getElementById('dateDevis').valueAsDate = new Date();
 
-  // localStorage
   const champsMemoire = ['monNom','monSiret','monAdresse','monEmail','monTel'];
   champsMemoire.forEach(id => {
     const v = localStorage.getItem(id);
@@ -460,9 +366,6 @@
     if (el) el.addEventListener('input', function() { localStorage.setItem(id, this.value); });
   });
 
-  // ══════════════════════════════════════
-  // NAVIGATION MOBILE
-  // ══════════════════════════════════════
   const titres = {
     historique: { title: '📁 Historique', sub: 'Mes devis sauvegardés' },
     formulaire: { title: '📄 DevisApp', sub: 'Nouveau devis' },
@@ -481,9 +384,6 @@
     if (nom === 'historique') afficherHistoriqueMobile();
   }
 
-  // ══════════════════════════════════════
-  // UTILITAIRES
-  // ══════════════════════════════════════
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -496,16 +396,18 @@
   }
 
   function marquerModifie() {
-    ['btnSauvegarder','btnSauvegarderMobile'].forEach(id => {
+    const ids = isMobile ? ['btnSauvegarderMobile'] : ['btnSauvegarder'];
+    ids.forEach(id => {
       const btn = document.getElementById(id);
-      if (btn) { btn.disabled = false; btn.textContent = isMobile ? '☁️' : '☁️ Sauvegarder'; }
+      if (btn) { btn.disabled = false; btn.textContent = '☁️ Sauvegarder'; }
     });
   }
 
   function griserBouton() {
-    ['btnSauvegarder','btnSauvegarderMobile'].forEach(id => {
+    const ids = isMobile ? ['btnSauvegarderMobile'] : ['btnSauvegarder'];
+    ids.forEach(id => {
       const btn = document.getElementById(id);
-      if (btn) { btn.disabled = true; btn.textContent = isMobile ? '✅' : '✅ Sauvegardé'; }
+      if (btn) { btn.disabled = true; btn.textContent = '✅ Sauvegardé'; }
     });
   }
 
@@ -515,9 +417,6 @@
     if (div) div.style.display = 'none';
   }
 
-  // ══════════════════════════════════════
-  // VALIDATION
-  // ══════════════════════════════════════
   function validerFormulaire() {
     let erreurs = [];
     const obligatoires = [
@@ -547,12 +446,9 @@
       return false;
     }
     if (div) div.style.display = 'none';
-    return erreurs.length === 0;
+    return true;
   }
 
-  // ══════════════════════════════════════
-  // FORMULAIRE
-  // ══════════════════════════════════════
   function nouveauDevis() {
     ['clientNom','clientAdresse','numeroDevis','objetDevis'].forEach(id => {
       const el = document.getElementById(id);
@@ -616,9 +512,6 @@
     marquerModifie();
   }
 
-  // ══════════════════════════════════════
-  // HISTORIQUE PC
-  // ══════════════════════════════════════
   let devisCache = [];
 
   function carteDevisHTML(d, suffixe='') {
@@ -633,7 +526,7 @@
             <span>${new Date(d.created_at).toLocaleDateString('fr-FR')}</span>
           </div>
           <div class="devis-card-btns">
-            <button class="btn-card charger" onclick="chargerDevisForm('${d.id}')" title="Charger ce devis">📂</button>
+            <button class="btn-card charger" onclick="chargerDevisForm('${d.id}')" title="Charger">📂</button>
             <button class="btn-card suppr" onclick="supprimerUnDevis('${d.id}', '${d.numero}')" title="Supprimer">🗑️</button>
           </div>
         </div>
@@ -722,11 +615,14 @@
     if (!confirme) return;
     const d = devisCache.find(x => x.id === id);
     if (!d) return;
-    ['numeroDevis','dateDevis','clientNom','clientAdresse','validite','objetDevis'].forEach(key => {
+    const mapping = {
+      numeroDevis: d.numero, dateDevis: d.date_devis,
+      clientNom: d.client_nom, clientAdresse: d.client_adresse,
+      validite: d.validite, objetDevis: d.objet
+    };
+    Object.entries(mapping).forEach(([key, val]) => {
       const el = document.getElementById(key);
-      const val = { numeroDevis: d.numero, dateDevis: d.date_devis, clientNom: d.client_nom,
-        clientAdresse: d.client_adresse, validite: d.validite, objetDevis: d.objet }[key] || '';
-      if (el) el.value = val;
+      if (el) el.value = val || '';
     });
     const lignes = document.getElementById('lignes');
     if (lignes) lignes.innerHTML = '';
@@ -736,9 +632,6 @@
     if (isMobile) changerOnglet('formulaire');
   }
 
-  // ══════════════════════════════════════
-  // SAUVEGARDE
-  // ══════════════════════════════════════
   async function sauvegarderDevisCloud() {
     if (!validerFormulaire()) return;
     griserBouton();
@@ -774,9 +667,6 @@
     }
   }
 
-  // ══════════════════════════════════════
-  // CHAT PC
-  // ══════════════════════════════════════
   function ajouterMessage(texte, role, estDevis=false, mobile=false) {
     const containerId = mobile ? 'chatMessagesMobile' : 'chatMessages';
     const div = document.createElement('div');
@@ -834,9 +724,6 @@
     if (mobile) changerOnglet('formulaire');
   }
 
-  // ══════════════════════════════════════
-  // PDF
-  // ══════════════════════════════════════
   function genererDevis() {
     if (!validerFormulaire()) return;
     const { jsPDF } = window.jspdf;
