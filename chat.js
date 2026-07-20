@@ -55,6 +55,15 @@ async function envoyerMessage(messageUtilisateur) {
   });
 
   const data = await reponse.json();
+
+  if (!reponse.ok) {
+    throw new Error(data.error || `Erreur ${reponse.status}`);
+  }
+
+  if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+    throw new Error('Réponse inattendue : ' + JSON.stringify(data));
+  }
+
   const contenu = data.choices[0].message.content;
   historique.push({ role: 'assistant', content: contenu });
   return contenu;
