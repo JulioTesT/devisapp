@@ -1,6 +1,4 @@
-const GROQ_API_KEY = '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';
 const MODELE = 'llama-3.3-70b-versatile';
-
 let historique = [];
 
 function getProfilUtilisateur() {
@@ -33,7 +31,7 @@ Informations du prestataire :
 Les prix doivent être cohérents avec le marché français pour ce métier et cette région.
 IMPORTANT : prixUnitaire est toujours un nombre sans zéro initial (ex: 50 pas 050).
 
-2. RÉPONDRE AUX QUESTIONS : Sur la réglementation, le droit, la comptabilité auto-entrepreneur. Si la question concerne une réglementation régionale ou spécifique, recherche les informations actuelles.
+2. RÉPONDRE AUX QUESTIONS : Sur la réglementation, le droit, la comptabilité auto-entrepreneur.
 
 ${profilInfo}
 
@@ -47,20 +45,12 @@ Règles :
 async function envoyerMessage(messageUtilisateur) {
   historique.push({ role: 'user', content: messageUtilisateur });
 
-  const reponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const reponse = await fetch('/api/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_API_KEY}`
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: MODELE,
-      messages: [
-        { role: 'system', content: getSystemPrompt() },
-        ...historique
-      ],
-      temperature: 0.7,
-      max_tokens: 1024
+      messages: historique,
+      systemPrompt: getSystemPrompt()
     })
   });
 
