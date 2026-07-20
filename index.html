@@ -25,13 +25,6 @@
       .app-mobile { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     }
 
-    .col-header {
-      padding: 16px; font-size: 13px; font-weight: bold;
-      letter-spacing: .05em;
-      border-bottom: 1px solid rgba(255,255,255,.1); flex-shrink: 0;
-    }
-    .col-header span { font-size: 11px; opacity: .5; display: block; margin-top: 2px; font-weight: normal; }
-
     h1 { text-align: center; margin-bottom: 20px; color: #1a1a2e; font-size: 20px; }
     h2 { font-size: 11px; text-transform: uppercase; color: #888; margin: 16px 0 8px; letter-spacing: 1px; }
     .label-champ { font-size: 12px; color: #555; margin-bottom: 3px; display: block; }
@@ -41,7 +34,7 @@
       width: 100%; padding: 9px 12px; border: 1px solid #ddd;
       border-radius: 6px; font-size: 14px; margin-bottom: 8px; transition: border-color .2s;
     }
-    input:focus, textarea:focus { outline: none; border-color: #1a3a5c; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #1a3a5c; }
     input.erreur, textarea.erreur { border-color: #e05252 !important; background: #fff5f5; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
@@ -63,6 +56,10 @@
       width: 100%; padding: 9px; background: #2d5a3d; color: white;
       border: none; border-radius: 8px; font-size: 13px; cursor: pointer; margin-top: 6px;
     }
+    .btn-profil-save {
+      width: 100%; padding: 12px; background: #2d5a3d; color: white;
+      border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 16px;
+    }
     .total { background: #f8f9fa; border-radius: 8px; padding: 10px 14px; margin-top: 6px; font-size: 14px; color: #1a1a2e; }
     .total span { font-weight: bold; font-size: 16px; }
     .ligne-prestation { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; margin-bottom: 8px; position: relative; }
@@ -74,7 +71,12 @@
       background: #fff5f5; border: 1px solid #e05252;
       border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c0392b; margin-top: 8px;
     }
+    .msg-succes {
+      background: #f0fff4; border: 1px solid #2d5a3d;
+      border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #2d5a3d; margin-top: 8px;
+    }
 
+    /* Historique */
     .devis-card {
       background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
       border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; transition: background .15s;
@@ -99,6 +101,7 @@
     }
     .btn-suppr-selection.visible { display: block; }
 
+    /* Chat */
     .chat-header { background: #1a1a2e; color: white; padding: 16px 20px; font-size: 15px; font-weight: bold; flex-shrink: 0; }
     .chat-header span { font-size: 12px; opacity: .6; display: block; margin-top: 2px; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -114,6 +117,7 @@
     .btn-envoyer { padding: 10px 16px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; align-self: flex-end; }
     .btn-appliquer { margin-top: 8px; padding: 6px 12px; background: #2d5a3d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
 
+    /* Toast */
     .toast {
       position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
       background: #1a3a5c; color: white; padding: 10px 20px;
@@ -122,48 +126,58 @@
     }
     .toast.show { opacity: 1; }
 
+    /* PC colonnes */
     .colonne-historique {
       background: #1a1a2e; color: white;
       display: flex; flex-direction: column; height: 100vh; overflow: hidden;
     }
+    .col-header { padding: 16px; font-size: 13px; font-weight: bold; letter-spacing: .05em; border-bottom: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
+    .col-header span { font-size: 11px; opacity: .5; display: block; margin-top: 2px; font-weight: normal; }
     .historique-scroll { flex: 1; overflow-y: auto; padding: 12px; }
     .historique-actions { padding: 10px 12px; border-top: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
-    .colonne-form { background: white; height: 100vh; overflow-y: auto; padding: 24px; border-right: 1px solid #e0e0e0; }
+    .colonne-form { background: white; height: 100vh; overflow-y: auto; border-right: 1px solid #e0e0e0; }
     .colonne-chat { display: flex; flex-direction: column; height: 100vh; background: #f8f9fa; }
 
-    .mobile-content { flex: 1; overflow: hidden; position: relative; }
-    .mobile-panel {
-      position: absolute; inset: 0; overflow-y: auto;
-      opacity: 0; pointer-events: none; transition: opacity .2s;
+    /* Tabs PC dans colonne form */
+    .form-tabs {
+      display: flex; border-bottom: 1px solid #e0e0e0; background: white; flex-shrink: 0; position: sticky; top: 0; z-index: 10;
     }
+    .form-tab {
+      flex: 1; padding: 12px; border: none; background: transparent;
+      font-size: 13px; cursor: pointer; color: #888; border-bottom: 3px solid transparent;
+    }
+    .form-tab.actif { color: #1a1a2e; border-bottom: 3px solid #1a1a2e; font-weight: bold; }
+    .form-panel { display: none; padding: 24px; }
+    .form-panel.actif { display: block; }
+
+    /* Profil badge */
+    .profil-badge {
+      background: #f0f7ff; border: 1px solid #1a3a5c;
+      border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;
+      font-size: 13px; color: #1a1a2e;
+    }
+    .profil-badge b { display: block; font-size: 15px; margin-bottom: 4px; }
+    .profil-badge span { opacity: .6; font-size: 12px; }
+
+    /* Mobile */
+    .mobile-content { flex: 1; overflow: hidden; position: relative; }
+    .mobile-panel { position: absolute; inset: 0; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity .2s; }
     .mobile-panel.actif { opacity: 1; pointer-events: all; }
     .mobile-panel.historique { background: #1a1a2e; color: white; padding: 16px; }
     .mobile-panel.historique h2 { color: rgba(255,255,255,.5); margin-bottom: 12px; }
     .mobile-panel.formulaire { background: white; padding: 20px 16px 100px; }
+    .mobile-panel.profil { background: white; padding: 20px 16px 100px; }
     .mobile-panel.chat { background: #f8f9fa; display: flex; flex-direction: column; }
     .mobile-panel.chat .chat-messages { flex: 1; padding-bottom: 16px; }
 
-    .tab-bar {
-      display: flex; background: white;
-      border-top: 1px solid #e0e0e0; flex-shrink: 0;
-      z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
-    }
-    .tab-btn {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 10px 0; border: none; background: transparent;
-      cursor: pointer; color: #aaa; transition: color .2s;
-      position: relative; border-top: 3px solid transparent;
-    }
-    .tab-btn .tab-icon { font-size: 22px; line-height: 1; }
-    .tab-btn .tab-label { font-size: 10px; font-weight: 500; }
+    .tab-bar { display: flex; background: white; border-top: 1px solid #e0e0e0; flex-shrink: 0; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
+    .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 0; border: none; background: transparent; cursor: pointer; color: #aaa; transition: color .2s; position: relative; border-top: 3px solid transparent; }
+    .tab-btn .tab-icon { font-size: 20px; line-height: 1; }
+    .tab-btn .tab-label { font-size: 9px; font-weight: 500; margin-top: 2px; }
     .tab-btn.actif { color: #1a1a2e; border-top: 3px solid #1a1a2e; }
     .tab-btn.actif .tab-label { font-weight: 700; }
 
-    .mobile-header {
-      background: #1a1a2e; color: white; padding: 14px 16px;
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
+    .mobile-header { background: #1a1a2e; color: white; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .mobile-header-title { font-size: 16px; font-weight: bold; }
     .mobile-header-sub { font-size: 11px; opacity: .6; }
   </style>
@@ -172,8 +186,10 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- VERSION PC -->
+<!-- ════ VERSION PC ════ -->
 <div class="app-desktop">
+
+  <!-- Historique -->
   <div class="colonne-historique">
     <div class="col-header">📁 Historique<span>Mes devis sauvegardés</span></div>
     <div class="historique-scroll" id="historiqueDevis">
@@ -186,15 +202,34 @@
     </div>
   </div>
 
+  <!-- Formulaire + Profil (tabs) -->
   <div class="colonne-form">
-    <h1>📄 DevisApp</h1>
-    <div id="form-content-desktop"></div>
-    <div id="erreurValidation-desktop" class="msg-erreur" style="display:none;"></div>
-    <button class="btn-principal" onclick="genererDevis()">📥 Générer le devis PDF</button>
-    <button class="btn-sauvegarder" id="btnSauvegarder" onclick="sauvegarderDevisCloud()">☁️ Sauvegarder</button>
-    <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
+    <div class="form-tabs">
+      <button class="form-tab actif" id="pc-tab-devis" onclick="changerTabPC('devis')">📄 Devis</button>
+      <button class="form-tab" id="pc-tab-profil" onclick="changerTabPC('profil')">👤 Mon profil</button>
+    </div>
+
+    <!-- Panel Devis PC -->
+    <div class="form-panel actif" id="pc-panel-devis">
+      <div id="profil-badge-desktop"></div>
+      <h1>📄 Nouveau devis</h1>
+      <div id="form-content-desktop"></div>
+      <div id="erreurValidation-desktop" class="msg-erreur" style="display:none;"></div>
+      <button class="btn-principal" onclick="genererDevis()">📥 Générer le devis PDF</button>
+      <button class="btn-sauvegarder" id="btnSauvegarder" onclick="sauvegarderDevisCloud()">☁️ Sauvegarder</button>
+      <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
+    </div>
+
+    <!-- Panel Profil PC -->
+    <div class="form-panel" id="pc-panel-profil">
+      <h1>👤 Mon profil</h1>
+      <div id="form-profil-desktop"></div>
+      <div id="profil-message-desktop"></div>
+      <button class="btn-profil-save" onclick="sauvegarderProfil()">💾 Sauvegarder le profil</button>
+    </div>
   </div>
 
+  <!-- Chat -->
   <div class="colonne-chat">
     <div class="chat-header">🤖 Assistant DevisApp<span>Décris ta prestation ou pose une question juridique</span></div>
     <div class="chat-messages" id="chatMessages">
@@ -219,7 +254,7 @@
   </div>
 </div>
 
-<!-- VERSION MOBILE -->
+<!-- ════ VERSION MOBILE ════ -->
 <div class="app-mobile">
   <div class="mobile-header">
     <div>
@@ -229,6 +264,8 @@
   </div>
 
   <div class="mobile-content">
+
+    <!-- Historique -->
     <div class="mobile-panel historique" id="panel-historique">
       <h2>Devis sauvegardés</h2>
       <div id="historiqueDevisMobile">
@@ -241,7 +278,9 @@
       </div>
     </div>
 
+    <!-- Formulaire -->
     <div class="mobile-panel formulaire actif" id="panel-formulaire">
+      <div id="profil-badge-mobile"></div>
       <div id="form-content-mobile"></div>
       <div id="erreurValidation-mobile" class="msg-erreur" style="display:none;"></div>
       <button class="btn-principal" onclick="genererDevis()">📥 Générer PDF</button>
@@ -249,6 +288,15 @@
       <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
     </div>
 
+    <!-- Profil -->
+    <div class="mobile-panel profil" id="panel-profil">
+      <h1>👤 Mon profil</h1>
+      <div id="form-profil-mobile"></div>
+      <div id="profil-message-mobile"></div>
+      <button class="btn-profil-save" onclick="sauvegarderProfil()">💾 Sauvegarder le profil</button>
+    </div>
+
+    <!-- Chat -->
     <div class="mobile-panel chat" id="panel-chat">
       <div class="chat-messages" id="chatMessagesMobile">
         <div class="msg assistant">
@@ -266,8 +314,10 @@
         <button class="btn-envoyer" onclick="envoyerChatMobile()">➤</button>
       </div>
     </div>
+
   </div>
 
+  <!-- Tab bar -->
   <div class="tab-bar">
     <button class="tab-btn" id="tab-historique" onclick="changerOnglet('historique')">
       <span class="tab-icon">📁</span>
@@ -276,6 +326,10 @@
     <button class="tab-btn actif" id="tab-formulaire" onclick="changerOnglet('formulaire')">
       <span class="tab-icon">📄</span>
       <span class="tab-label">Devis</span>
+    </button>
+    <button class="tab-btn" id="tab-profil" onclick="changerOnglet('profil')">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">Profil</span>
     </button>
     <button class="tab-btn" id="tab-chat" onclick="changerOnglet('chat')">
       <span class="tab-icon">🤖</span>
@@ -287,20 +341,86 @@
 <script>
   const isMobile = window.innerWidth <= 768;
 
-  function getFormHTML() {
-    return `
-      <h2>Mes informations</h2>
-      <label class="label-champ">Nom / raison sociale <span class="obligatoire">*</span></label>
-      <input type="text" id="monNom" placeholder="Ton nom" oninput="marquerModifie(); effacerErreur(this)">
-      <label class="label-champ">SIRET <span class="obligatoire">*</span></label>
-      <input type="text" id="monSiret" placeholder="14 chiffres" oninput="marquerModifie(); effacerErreur(this)">
-      <label class="label-champ">Adresse</label>
-      <input type="text" id="monAdresse" placeholder="Adresse complète" oninput="marquerModifie()">
-      <label class="label-champ">Email</label>
-      <input type="text" id="monEmail" placeholder="Email" oninput="marquerModifie()">
-      <label class="label-champ">Téléphone</label>
-      <input type="text" id="monTel" placeholder="Téléphone" oninput="marquerModifie()">
+  // ══════════════════════════════════════
+  // PROFIL
+  // ══════════════════════════════════════
+  const CHAMPS_PROFIL = [
+    { id: 'p_nom', label: 'Nom / raison sociale', placeholder: 'Jean Dupont', obligatoire: true },
+    { id: 'p_metier', label: 'Métier / activité', placeholder: 'Électricien, Graphiste, Plombier...', obligatoire: true },
+    { id: 'p_siret', label: 'Numéro SIRET', placeholder: '12345678901234', obligatoire: true },
+    { id: 'p_urssaf', label: 'Numéro URSSAF', placeholder: 'Optionnel' },
+    { id: 'p_region', label: 'Région / département', placeholder: 'Ex: PACA, Île-de-France...' },
+    { id: 'p_adresse', label: 'Adresse professionnelle', placeholder: '12 rue de la Paix, 75001 Paris' },
+    { id: 'p_email', label: 'Email professionnel', placeholder: 'contact@monentreprise.fr' },
+    { id: 'p_tel', label: 'Téléphone', placeholder: '06 12 34 56 78' },
+    { id: 'p_validite', label: 'Validité des devis par défaut', placeholder: '30 jours' },
+    { id: 'p_mention', label: 'Mention légale personnalisée', placeholder: 'Optionnel — ex: RCS Paris 123 456 789' },
+  ];
 
+  function getProfilFormHTML() {
+    return CHAMPS_PROFIL.map(c => `
+      <label class="label-champ">${c.label}${c.obligatoire ? ' <span class="obligatoire">*</span>' : ''}</label>
+      <input type="text" id="${c.id}" placeholder="${c.placeholder}" oninput="sauvegarderProfilAuto()">
+    `).join('');
+  }
+
+  function chargerProfil() {
+    const profil = {};
+    CHAMPS_PROFIL.forEach(c => {
+      const v = localStorage.getItem(c.id);
+      const el = document.getElementById(c.id);
+      if (v) { if (el) el.value = v; profil[c.id] = v; }
+    });
+    return profil;
+  }
+
+  function sauvegarderProfilAuto() {
+    CHAMPS_PROFIL.forEach(c => {
+      const el = document.getElementById(c.id);
+      if (el) localStorage.setItem(c.id, el.value);
+    });
+  }
+
+  function sauvegarderProfil() {
+    sauvegarderProfilAuto();
+    afficherBadgeProfil();
+    const msgId = isMobile ? 'profil-message-mobile' : 'profil-message-desktop';
+    const div = document.getElementById(msgId);
+    if (div) {
+      div.className = 'msg-succes';
+      div.textContent = '✅ Profil sauvegardé — il sera utilisé pour tous vos prochains devis.';
+      setTimeout(() => { div.textContent = ''; div.className = ''; }, 3000);
+    }
+    showToast('✅ Profil sauvegardé');
+  }
+
+  function getProfil() {
+    const p = {};
+    CHAMPS_PROFIL.forEach(c => { p[c.id] = localStorage.getItem(c.id) || ''; });
+    return p;
+  }
+
+  function afficherBadgeProfil() {
+    const p = getProfil();
+    if (!p.p_nom && !p.p_metier) return;
+    const html = `
+      <div class="profil-badge">
+        <b>${p.p_nom || 'Profil incomplet'}</b>
+        <span>${p.p_metier || ''}${p.p_region ? ' · ' + p.p_region : ''}</span>
+      </div>
+    `;
+    ['profil-badge-desktop','profil-badge-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    });
+  }
+
+  // ══════════════════════════════════════
+  // FORMULAIRE DEVIS
+  // ══════════════════════════════════════
+  function getFormHTML() {
+    const p = getProfil();
+    return `
       <h2>Client</h2>
       <label class="label-champ">Nom du client <span class="obligatoire">*</span></label>
       <input type="text" id="clientNom" placeholder="Nom / raison sociale" oninput="marquerModifie(); effacerErreur(this)">
@@ -343,32 +463,30 @@
         </div>
       </div>
       <label class="label-champ">Validité</label>
-      <input type="text" id="validite" value="30 jours" oninput="marquerModifie()">
+      <input type="text" id="validite" value="${p.p_validite || '30 jours'}" oninput="marquerModifie()">
     `;
   }
 
+  // Injection formulaires
   if (isMobile) {
     document.getElementById('form-content-mobile').innerHTML = getFormHTML();
+    document.getElementById('form-profil-mobile').innerHTML = getProfilFormHTML();
   } else {
     document.getElementById('form-content-desktop').innerHTML = getFormHTML();
+    document.getElementById('form-profil-desktop').innerHTML = getProfilFormHTML();
   }
 
   document.getElementById('dateDevis').valueAsDate = new Date();
+  chargerProfil();
+  afficherBadgeProfil();
 
-  const champsMemoire = ['monNom','monSiret','monAdresse','monEmail','monTel'];
-  champsMemoire.forEach(id => {
-    const v = localStorage.getItem(id);
-    const el = document.getElementById(id);
-    if (v && el) el.value = v;
-  });
-  champsMemoire.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', function() { localStorage.setItem(id, this.value); });
-  });
-
+  // ══════════════════════════════════════
+  // NAVIGATION
+  // ══════════════════════════════════════
   const titres = {
     historique: { title: '📁 Historique', sub: 'Mes devis sauvegardés' },
     formulaire: { title: '📄 DevisApp', sub: 'Nouveau devis' },
+    profil: { title: '👤 Mon profil', sub: 'Informations entrepreneur' },
     chat: { title: '🤖 Assistant', sub: 'Génération & questions' }
   };
 
@@ -384,6 +502,16 @@
     if (nom === 'historique') afficherHistoriqueMobile();
   }
 
+  function changerTabPC(nom) {
+    document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('actif'));
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('actif'));
+    document.getElementById('pc-tab-' + nom).classList.add('actif');
+    document.getElementById('pc-panel-' + nom).classList.add('actif');
+  }
+
+  // ══════════════════════════════════════
+  // UTILITAIRES
+  // ══════════════════════════════════════
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -417,18 +545,21 @@
     if (div) div.style.display = 'none';
   }
 
+  // ══════════════════════════════════════
+  // VALIDATION
+  // ══════════════════════════════════════
   function validerFormulaire() {
+    const p = getProfil();
     let erreurs = [];
-    const obligatoires = [
-      { id: 'monNom', label: 'Nom / raison sociale' },
-      { id: 'monSiret', label: 'SIRET' },
-      { id: 'clientNom', label: 'Nom du client' },
-      { id: 'numeroDevis', label: 'N° de devis' },
-    ];
-    obligatoires.forEach(c => {
-      const el = document.getElementById(c.id);
-      if (el && !el.value.trim()) { el.classList.add('erreur'); erreurs.push(c.label); }
-    });
+
+    if (!p.p_nom) erreurs.push('Profil incomplet — Nom manquant');
+    if (!p.p_siret) erreurs.push('Profil incomplet — SIRET manquant');
+
+    const clientNom = document.getElementById('clientNom');
+    const numeroDevis = document.getElementById('numeroDevis');
+    if (clientNom && !clientNom.value.trim()) { clientNom.classList.add('erreur'); erreurs.push('Nom du client'); }
+    if (numeroDevis && !numeroDevis.value.trim()) { numeroDevis.classList.add('erreur'); erreurs.push('N° de devis'); }
+
     let ligneValide = false;
     document.querySelectorAll('.ligne-prestation').forEach(ligne => {
       const desc = ligne.querySelector('textarea').value.trim();
@@ -438,9 +569,10 @@
       if (pu === '') ligne.querySelector('.pu').classList.add('erreur');
     });
     if (!ligneValide) erreurs.push('Au moins une prestation avec description et prix');
+
     const div = getErreurEl();
     if (erreurs.length > 0 && div) {
-      div.innerHTML = '⚠️ Champs obligatoires manquants :<br>• ' + erreurs.join('<br>• ');
+      div.innerHTML = '⚠️ Informations manquantes :<br>• ' + erreurs.join('<br>• ');
       div.style.display = 'block';
       div.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return false;
@@ -449,13 +581,17 @@
     return true;
   }
 
+  // ══════════════════════════════════════
+  // FORMULAIRE
+  // ══════════════════════════════════════
   function nouveauDevis() {
     ['clientNom','clientAdresse','numeroDevis','objetDevis'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    const p = getProfil();
     const validite = document.getElementById('validite');
-    if (validite) validite.value = '30 jours';
+    if (validite) validite.value = p.p_validite || '30 jours';
     const dateDevis = document.getElementById('dateDevis');
     if (dateDevis) dateDevis.valueAsDate = new Date();
     const lignes = document.getElementById('lignes');
@@ -512,14 +648,16 @@
     marquerModifie();
   }
 
+  // ══════════════════════════════════════
+  // HISTORIQUE
+  // ══════════════════════════════════════
   let devisCache = [];
 
   function carteDevisHTML(d, suffixe='') {
     return `
       <div class="devis-card" id="card-${d.id}${suffixe}">
         <div class="devis-card-top">
-          <input type="checkbox" class="devis-checkbox" value="${d.id}"
-            onchange="majSelection('${suffixe}')" title="Sélectionner">
+          <input type="checkbox" class="devis-checkbox" value="${d.id}" onchange="majSelection('${suffixe}')" title="Sélectionner">
           <div class="devis-card-info">
             <b>${d.numero}</b>
             <span>${d.client_nom || 'Client'} · ${(d.total||0).toLocaleString('fr-FR')}€</span>
@@ -576,10 +714,7 @@
   async function supprimerSelection() {
     const cases = document.querySelectorAll('.devis-checkbox:checked');
     if (!cases.length) return;
-    const confirme = await afficherConfirmation(
-      '🗑️ Supprimer la sélection',
-      `Supprimer <b>${cases.length} devis</b> définitivement ?`, 'Supprimer tout', 'Annuler'
-    );
+    const confirme = await afficherConfirmation('🗑️ Supprimer la sélection', `Supprimer <b>${cases.length} devis</b> définitivement ?`, 'Supprimer tout', 'Annuler');
     if (!confirme) return;
     for (const c of cases) await supprimerDevis(c.value);
     devisCache = [];
@@ -594,10 +729,7 @@
   }
 
   async function supprimerUnDevis(id, numero) {
-    const confirme = await afficherConfirmation(
-      '🗑️ Supprimer le devis',
-      `Supprimer définitivement le devis <b>${numero}</b> ?`, 'Supprimer', 'Annuler'
-    );
+    const confirme = await afficherConfirmation('🗑️ Supprimer', `Supprimer définitivement le devis <b>${numero}</b> ?`, 'Supprimer', 'Annuler');
     if (!confirme) return;
     await supprimerDevis(id);
     devisCache = [];
@@ -608,22 +740,12 @@
   }
 
   async function chargerDevisForm(id) {
-    const confirme = await afficherConfirmation(
-      '📂 Charger le devis',
-      `Charger ce devis ?<br>Les données actuelles seront remplacées.`, 'Charger', 'Annuler'
-    );
+    const confirme = await afficherConfirmation('📂 Charger', `Charger ce devis ?<br>Les données actuelles seront remplacées.`, 'Charger', 'Annuler');
     if (!confirme) return;
     const d = devisCache.find(x => x.id === id);
     if (!d) return;
-    const mapping = {
-      numeroDevis: d.numero, dateDevis: d.date_devis,
-      clientNom: d.client_nom, clientAdresse: d.client_adresse,
-      validite: d.validite, objetDevis: d.objet
-    };
-    Object.entries(mapping).forEach(([key, val]) => {
-      const el = document.getElementById(key);
-      if (el) el.value = val || '';
-    });
+    const mapping = { numeroDevis: d.numero, dateDevis: d.date_devis, clientNom: d.client_nom, clientAdresse: d.client_adresse, validite: d.validite, objetDevis: d.objet };
+    Object.entries(mapping).forEach(([key, val]) => { const el = document.getElementById(key); if (el) el.value = val || ''; });
     const lignes = document.getElementById('lignes');
     if (lignes) lignes.innerHTML = '';
     (d.lignes || []).forEach(l => ajouterLigne(l.description, l.quantite, l.prixUnitaire));
@@ -632,9 +754,13 @@
     if (isMobile) changerOnglet('formulaire');
   }
 
+  // ══════════════════════════════════════
+  // SAUVEGARDE CLOUD
+  // ══════════════════════════════════════
   async function sauvegarderDevisCloud() {
     if (!validerFormulaire()) return;
     griserBouton();
+    const p = getProfil();
     const lignesDOM = document.querySelectorAll('.ligne-prestation');
     let lignes = [];
     let total = 0;
@@ -654,19 +780,14 @@
       lignes: lignes, total: total
     };
     const result = await sauvegarderDevis(data);
-    if (result === null) {
-      marquerModifie();
-    } else if (result && !result.error) {
-      devisCache = [];
-      showToast('✅ Devis sauvegardé');
-      afficherHistorique();
-      afficherHistoriqueMobile();
-    } else {
-      marquerModifie();
-      showToast('❌ Erreur lors de la sauvegarde');
-    }
+    if (result === null) { marquerModifie(); }
+    else if (result && !result.error) { devisCache = []; showToast('✅ Devis sauvegardé'); afficherHistorique(); afficherHistoriqueMobile(); }
+    else { marquerModifie(); showToast('❌ Erreur lors de la sauvegarde'); }
   }
 
+  // ══════════════════════════════════════
+  // CHAT IA
+  // ══════════════════════════════════════
   function ajouterMessage(texte, role, estDevis=false, mobile=false) {
     const containerId = mobile ? 'chatMessagesMobile' : 'chatMessages';
     const div = document.createElement('div');
@@ -677,15 +798,8 @@
     return div;
   }
 
-  function envoyerExemple(btn) {
-    document.getElementById('chatInput').value = btn.textContent;
-    envoyerChat();
-  }
-
-  function envoyerExempleMobile(btn) {
-    document.getElementById('chatInputMobile').value = btn.textContent;
-    envoyerChatMobile();
-  }
+  function envoyerExemple(btn) { document.getElementById('chatInput').value = btn.textContent; envoyerChat(); }
+  function envoyerExempleMobile(btn) { document.getElementById('chatInputMobile').value = btn.textContent; envoyerChatMobile(); }
 
   async function envoyerChat(mobile=false) {
     const inputId = mobile ? 'chatInputMobile' : 'chatInput';
@@ -724,15 +838,21 @@
     if (mobile) changerOnglet('formulaire');
   }
 
+  // ══════════════════════════════════════
+  // PDF
+  // ══════════════════════════════════════
   function genererDevis() {
     if (!validerFormulaire()) return;
+    const p = getProfil();
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const monNom = document.getElementById('monNom').value;
-    const monSiret = document.getElementById('monSiret').value;
-    const monAdresse = document.getElementById('monAdresse').value || '';
-    const monEmail = document.getElementById('monEmail').value || '';
-    const monTel = document.getElementById('monTel').value || '';
+    const monNom = p.p_nom || '';
+    const monSiret = p.p_siret || '';
+    const monAdresse = p.p_adresse || '';
+    const monEmail = p.p_email || '';
+    const monTel = p.p_tel || '';
+    const monUrssaf = p.p_urssaf || '';
+    const monMention = p.p_mention || '';
     const clientNom = document.getElementById('clientNom').value;
     const clientAdresse = document.getElementById('clientAdresse').value || '';
     const numeroDevis = document.getElementById('numeroDevis').value;
@@ -751,6 +871,7 @@
       totalGeneral += sousTotal;
       prestations.push({ desc, qte, pu, sousTotal });
     });
+
     doc.setFillColor(26, 26, 46); doc.rect(0, 0, 210, 28, 'F');
     doc.setTextColor(255, 255, 255); doc.setFontSize(20); doc.setFont('helvetica', 'bold');
     doc.text('DEVIS', 14, 18);
@@ -765,18 +886,23 @@
     doc.setFontSize(9); doc.setFont('helvetica', 'bold'); doc.setTextColor(30,30,30);
     doc.text('PRESTATAIRE', 14, yDepart + 4);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-    doc.text(monNom, 14, yDepart + 11);
-    if (monAdresse) doc.text(monAdresse, 14, yDepart + 17);
-    if (monEmail) doc.text(monEmail, 14, yDepart + 23);
-    if (monTel) doc.text(monTel, 14, yDepart + 29);
+    let yPrest = yDepart + 11;
+    doc.text(monNom, 14, yPrest); yPrest += 6;
+    if (monAdresse) { doc.text(monAdresse, 14, yPrest); yPrest += 6; }
+    if (monEmail) { doc.text(monEmail, 14, yPrest); yPrest += 6; }
+    if (monTel) { doc.text(monTel, 14, yPrest); yPrest += 6; }
     doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-    doc.text(`SIRET : ${monSiret}`, 14, yDepart + 36);
+    doc.text(`SIRET : ${monSiret}`, 14, yPrest); yPrest += 5;
+    if (monUrssaf) { doc.text(`URSSAF : ${monUrssaf}`, 14, yPrest); yPrest += 5; }
+    if (monMention) { doc.text(monMention, 14, yPrest); }
+
     doc.setTextColor(30, 30, 30); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
     doc.text('CLIENT', 120, yDepart + 4);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
     doc.text(clientNom, 120, yDepart + 11);
     if (clientAdresse) doc.text(doc.splitTextToSize(clientAdresse, 75), 120, yDepart + 17);
-    const ySep = yDepart + 44; doc.setDrawColor(200,200,200); doc.line(14, ySep, 196, ySep);
+
+    const ySep = yDepart + 50; doc.setDrawColor(200,200,200); doc.line(14, ySep, 196, ySep);
     const yTab = ySep + 5; doc.setFillColor(240,240,245); doc.rect(14, yTab, 182, 8, 'F');
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(26,26,46);
     doc.text('DÉSIGNATION', 16, yTab+6); doc.text('QTÉ', 130, yTab+6);

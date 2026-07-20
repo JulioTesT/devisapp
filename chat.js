@@ -1,37 +1,47 @@
-const GROQ_API_KEY = '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'; 
+const GROQ_API_KEY = 'ggsk_nXpcy0DCuNrkHB7LpLapWGdyb3FYsc83WmlukylkNycf2aF4KJOI';
 const MODELE = 'llama-3.3-70b-versatile';
 
 let historique = [];
 
 function getProfilUtilisateur() {
   return {
-    nom: localStorage.getItem('monNom') || '',
-    siret: localStorage.getItem('monSiret') || '',
-    adresse: localStorage.getItem('monAdresse') || '',
-    email: localStorage.getItem('monEmail') || '',
-    tel: localStorage.getItem('monTel') || ''
+    nom: localStorage.getItem('p_nom') || '',
+    metier: localStorage.getItem('p_metier') || '',
+    siret: localStorage.getItem('p_siret') || '',
+    region: localStorage.getItem('p_region') || '',
+    adresse: localStorage.getItem('p_adresse') || '',
+    email: localStorage.getItem('p_email') || '',
+    tel: localStorage.getItem('p_tel') || '',
+    urssaf: localStorage.getItem('p_urssaf') || '',
   };
 }
 
 function getSystemPrompt() {
-  const profil = getProfilUtilisateur();
+  const p = getProfilUtilisateur();
+  const profilInfo = p.nom ? `
+Informations du prestataire :
+- Nom : ${p.nom}
+- Métier : ${p.metier || 'Non renseigné'}
+- Région : ${p.region || 'Non renseignée'}
+- SIRET : ${p.siret}
+` : 'Profil non renseigné.';
+
   return `Tu es un assistant spécialisé pour les auto-entrepreneurs français. Tu as deux rôles :
 
-1. GÉNÉRER DES DEVIS : Quand l'utilisateur décrit une prestation, tu génères les lignes du devis de façon professionnelle avec le bon jargon métier. Tu réponds UNIQUEMENT avec un JSON dans ce format exact :
+1. GÉNÉRER DES DEVIS : Quand l'utilisateur décrit une prestation, génère les lignes du devis avec le bon jargon métier adapté à "${p.metier || 'auto-entrepreneur'}". Réponds UNIQUEMENT avec un JSON :
 {"action":"devis","lignes":[{"description":"...","quantite":1,"prixUnitaire":100}]}
+Les prix doivent être cohérents avec le marché français pour ce métier et cette région.
+IMPORTANT : prixUnitaire est toujours un nombre sans zéro initial (ex: 50 pas 050).
 
-2. RÉPONDRE AUX QUESTIONS : Sur la réglementation, le droit, la comptabilité auto-entrepreneur. Tu réponds de façon claire et précise en français.
+2. RÉPONDRE AUX QUESTIONS : Sur la réglementation, le droit, la comptabilité auto-entrepreneur. Si la question concerne une réglementation régionale ou spécifique, recherche les informations actuelles.
 
-Informations du prestataire à utiliser dans les devis :
-- Nom : ${profil.nom || 'Non renseigné'}
-- SIRET : ${profil.siret || 'Non renseigné'}
-- Adresse : ${profil.adresse || 'Non renseignée'}
+${profilInfo}
 
-Règles importantes :
-- Toujours utiliser un vocabulaire professionnel adapté au métier
-- Les prix proposés doivent être cohérents avec le marché français
-- Pour les questions juridiques, toujours préciser de consulter un professionnel pour les cas complexes
-- Tu réponds TOUJOURS en français`;
+Règles :
+- Vocabulaire professionnel adapté au métier "${p.metier || 'auto-entrepreneur'}"
+- Pour les questions juridiques, précise de consulter un professionnel pour les cas complexes
+- Réponds TOUJOURS en français
+- Si tu détectes une question sur la réglementation locale (${p.region || 'France'}), sois précis sur les spécificités régionales`;
 }
 
 async function envoyerMessage(messageUtilisateur) {
