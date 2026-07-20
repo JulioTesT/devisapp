@@ -1,4 +1,4 @@
-const GROQ_API_KEY = 'ggsk_nXpcy0DCuNrkHB7LpLapWGdyb3FYsc83WmlukylkNycf2aF4KJOI';
+const GROQ_API_KEY = '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';
 const MODELE = 'llama-3.3-70b-versatile';
 
 let historique = [];
