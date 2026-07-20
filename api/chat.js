@@ -19,7 +19,22 @@ export default async function handler(req, res) {
           ...messages
         ],
         temperature: 0.7,
-        max_tokens: 1024
+        max_tokens: 1024,
+        tools: [{
+          type: 'function',
+          function: {
+            name: 'web_search',
+            description: 'Recherche des informations actuelles sur internet',
+            parameters: {
+              type: 'object',
+              properties: {
+                query: { type: 'string', description: 'La requête de recherche' }
+              },
+              required: ['query']
+            }
+          }
+        }],
+        tool_choice: 'auto'
       })
     });
 
