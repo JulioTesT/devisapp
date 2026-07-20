@@ -5,6 +5,10 @@ export default async function handler(req, res) {
 
   const { messages, systemPrompt } = req.body;
 
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: 'Clé GROQ_API_KEY manquante' });
+  }
+
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -23,14 +27,25 @@ export default async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
+    const text = await response.text();
+
+    if (!text) {
+      return res.status(500).json({ error: 'Réponse vide de Groq' });
+    }
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(e) {
+      return res.status(500).json({ error: 'Réponse Groq non-JSON : ' + text.substring(0, 200) });
+    }
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'Erreur API Groq' });
+      return res.status(response.status).json({ error: data.error?.message || 'Erreur Groq ' + response.status });
     }
 
     res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: error.message });
   }
 }
