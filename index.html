@@ -1321,7 +1321,7 @@
       }
     } catch (err) {
       typing.remove();
-      ajouterMessage('❌ ' + (err.message || 'Erreur de connexion à l'IA.'), 'assistant', false, mobile);
+      ajouterMessage('❌ Erreur : ' + (err.message || 'connexion impossible'), 'assistant', false, mobile);
     }
   }
 
