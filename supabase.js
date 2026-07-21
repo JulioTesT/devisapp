@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://zxqhhghxplwvggvxsaza.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_I5Mb273YBQEs8H6aV3MZnA_wwKhvNGd';
-
+ 
 async function supabaseFetch(endpoint, options = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
     headers: {
@@ -14,49 +14,41 @@ async function supabaseFetch(endpoint, options = {}) {
   });
   return res.json();
 }
-
+ 
 async function sauvegarderDevis(devisData) {
   const existants = await supabaseFetch(`devis?numero=eq.${encodeURIComponent(devisData.numero)}`);
-
   if (existants && existants.length > 0) {
     const confirme = await afficherConfirmation(
       '⚠️ Devis existant',
       `Le devis <b>${devisData.numero}</b> existe déjà.<br><br>La version actuelle sera <b>remplacée définitivement</b>. Continuer ?`,
-      'Remplacer',
-      'Annuler'
+      'Remplacer', 'Annuler'
     );
-
     if (!confirme) return null;
-
     return await supabaseFetch(`devis?numero=eq.${encodeURIComponent(devisData.numero)}`, {
       method: 'PATCH',
       body: JSON.stringify(devisData)
     });
   }
-
   return await supabaseFetch('devis', {
     method: 'POST',
     body: JSON.stringify(devisData)
   });
 }
-
+ 
 async function chargerDevis() {
   return await supabaseFetch('devis?order=created_at.desc');
 }
-
+ 
 async function supprimerDevis(id) {
-  return await supabaseFetch(`devis?id=eq.${id}`, {
-    method: 'DELETE'
-  });
+  return await supabaseFetch(`devis?id=eq.${id}`, { method: 'DELETE' });
 }
-
+ 
 function afficherConfirmation(titre, message, btnOui, btnNon) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 1000;
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
     `;
     overlay.innerHTML = `
       <div style="background: white; border-radius: 12px; padding: 28px;
@@ -74,13 +66,7 @@ function afficherConfirmation(titre, message, btnOui, btnNon) {
       </div>
     `;
     document.body.appendChild(overlay);
-    document.getElementById('btn-oui').onclick = () => {
-      document.body.removeChild(overlay);
-      resolve(true);
-    };
-    document.getElementById('btn-non').onclick = () => {
-      document.body.removeChild(overlay);
-      resolve(false);
-    };
+    document.getElementById('btn-oui').onclick = () => { document.body.removeChild(overlay); resolve(true); };
+    document.getElementById('btn-non').onclick = () => { document.body.removeChild(overlay); resolve(false); };
   });
 }
