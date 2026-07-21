@@ -265,11 +265,72 @@
     .mobile-header { background: #1a1a2e; color: white; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .mobile-header-title { font-size: 16px; font-weight: bold; }
     .mobile-header-sub { font-size: 11px; opacity: .6; }
+
+    /* Auth */
+    .auth-overlay {
+      position: fixed; inset: 0; background: #1a1a2e;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; padding: 24px;
+    }
+    .auth-box {
+      background: white; border-radius: 16px; padding: 32px 28px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .auth-box h2 { font-size: 22px; color: #1a1a2e; margin-bottom: 6px; text-align: center; }
+    .auth-box p { font-size: 13px; color: #888; text-align: center; margin-bottom: 24px; }
+    .auth-box input { margin-bottom: 12px; }
+    .btn-auth-submit {
+      width: 100%; padding: 13px; background: #1a1a2e; color: white;
+      border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; margin-top: 4px;
+    }
+    .btn-auth-submit:hover { background: #2a2a4e; }
+    .auth-toggle { text-align: center; margin-top: 16px; font-size: 13px; color: #888; }
+    .auth-toggle a { color: #1a3a5c; cursor: pointer; font-weight: bold; text-decoration: none; }
+    .auth-toggle a:hover { text-decoration: underline; }
+    .auth-msg { font-size: 13px; text-align: center; margin-top: 12px; padding: 10px; border-radius: 8px; }
+    .auth-msg.erreur { background: #fff5f5; color: #c0392b; }
+    .auth-msg.succes { background: #f0fff4; color: #2d5a3d; }
+
+    /* Barre utilisateur */
+    .user-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: #f0f7ff; border: 1px solid #1a3a5c;
+      border-radius: 8px; margin-bottom: 12px; font-size: 12px; color: #1a1a2e;
+    }
+    .user-bar span { opacity: .7; }
+    .user-bar-btns { display: flex; gap: 6px; }
+    .btn-sync {
+      padding: 5px 10px; background: #1a3a5c; color: white;
+      border: none; border-radius: 6px; font-size: 11px; cursor: pointer;
+    }
+    .btn-sync:hover { background: #254d78; }
+    .btn-deconnexion {
+      padding: 5px 10px; background: #e05252; color: white;
+      border: none; border-radius: 6px; font-size: 11px; cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
+
+<!-- ÉCRAN AUTH -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <h2>📄 DevisApp</h2>
+    <p id="authSubtitle">Connectez-vous pour synchroniser vos données</p>
+    <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
+    <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter') soumettreAuth()">
+    <button class="btn-auth-submit" onclick="soumettreAuth()" id="btnAuthSubmit">Se connecter</button>
+    <div class="auth-toggle">
+      <span id="authToggleText">Pas encore de compte ?</span>
+      <a onclick="basculerAuthMode()"> <span id="authToggleLink">S'inscrire</span></a>
+    </div>
+    <div id="authMsg" class="auth-msg" style="display:none"></div>
+  </div>
+</div>
 
 <!-- Modale prévisualisation devis -->
 <div class="modal-apercu-overlay" id="modalApercu" style="display:none" onclick="if(event.target===this)fermerApercu()">
@@ -317,6 +378,7 @@
     </div>
 
     <div class="form-panel actif" id="pc-panel-devis">
+      <div id="user-bar-desktop"></div>
       <div id="profil-badge-desktop"></div>
       <h1>📄 Nouveau devis</h1>
       <div id="form-content-desktop"></div>
@@ -384,6 +446,7 @@
     </div>
 
     <div class="mobile-panel formulaire actif" id="panel-formulaire">
+      <div id="user-bar-mobile"></div>
       <div id="profil-badge-mobile"></div>
       <div id="form-content-mobile"></div>
       <div id="erreurValidation-mobile" class="msg-erreur" style="display:none;"></div>
@@ -597,9 +660,6 @@
   function genererSVGMiniature(design, c) {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 210 148');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
     const _r = (tag, attrs, parent) => {
@@ -751,8 +811,6 @@
 
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 210 297');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', 'auto');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
     const _r = (tag, attrs, parent) => {
@@ -1652,7 +1710,151 @@
     mentionsLegales(doc, y+20, d.validite);
   }
 
-  afficherHistorique();
+  // ══════════════════════════════════════
+  // AUTH & SYNC
+  // ══════════════════════════════════════
+  let authMode = 'login';
+
+  function basculerAuthMode() {
+    authMode = authMode === 'login' ? 'signup' : 'login';
+    document.getElementById('authSubtitle').textContent = authMode === 'login'
+      ? 'Connectez-vous pour synchroniser vos données'
+      : 'Créez votre compte DevisApp';
+    document.getElementById('btnAuthSubmit').textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
+    document.getElementById('authToggleText').textContent = authMode === 'login' ? 'Pas encore de compte ?' : 'Déjà un compte ?';
+    document.getElementById('authToggleLink').textContent = authMode === 'login' ? "S'inscrire" : 'Se connecter';
+    document.getElementById('authMsg').style.display = 'none';
+  }
+
+  async function soumettreAuth() {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const msg = document.getElementById('authMsg');
+    if (!email || !password) {
+      msg.textContent = 'Email et mot de passe requis.';
+      msg.className = 'auth-msg erreur'; msg.style.display = 'block'; return;
+    }
+    const btn = document.getElementById('btnAuthSubmit');
+    btn.textContent = '⏳ ...'; btn.disabled = true;
+    try {
+      if (authMode === 'signup') {
+        const data = await authSignUp(email, password);
+        if (data.user && !data.access_token) {
+          msg.textContent = '✅ Vérifiez votre email pour confirmer votre compte.';
+          msg.className = 'auth-msg succes'; msg.style.display = 'block';
+          btn.textContent = "S'inscrire"; btn.disabled = false; return;
+        }
+      } else {
+        await authSignIn(email, password);
+      }
+      await apresConnexion();
+    } catch(e) {
+      msg.textContent = '❌ ' + e.message;
+      msg.className = 'auth-msg erreur'; msg.style.display = 'block';
+      btn.textContent = authMode === 'login' ? 'Se connecter' : "S'inscrire";
+      btn.disabled = false;
+    }
+  }
+
+  async function apresConnexion() {
+    document.getElementById('authOverlay').style.display = 'none';
+    afficherUserBar();
+    try {
+      const profilCloud = await chargerProfilCloud();
+      if (profilCloud) {
+        Object.entries(profilCloud).forEach(([k, v]) => localStorage.setItem(k, v));
+        chargerProfil(); afficherBadgeProfil(); rafraichirMiniatures();
+        showToast('✅ Profil synchronisé');
+      }
+    } catch(e) {}
+    devisCache = [];
+    afficherHistorique(); afficherHistoriqueMobile();
+  }
+
+  async function deconnexion() {
+    const confirme = await afficherConfirmation('Déconnexion', 'Voulez-vous vous déconnecter ?', 'Déconnecter', 'Annuler');
+    if (!confirme) return;
+    await authSignOut();
+    document.getElementById('authOverlay').style.display = 'flex';
+    afficherUserBar();
+    showToast('Déconnecté');
+  }
+
+  function afficherUserBar() {
+    const user = getUser();
+    const html = user ? `
+      <div class="user-bar">
+        <span>👤 ${user.email}</span>
+        <div class="user-bar-btns">
+          <button class="btn-sync" onclick="synchroniser()">🔄 Sync</button>
+          <button class="btn-deconnexion" onclick="deconnexion()">Déconnecter</button>
+        </div>
+      </div>` : '';
+    ['user-bar-desktop', 'user-bar-mobile'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = html;
+    });
+  }
+
+  async function synchroniser() {
+    showToast('🔄 Synchronisation...');
+    try {
+      const profilLocal = {};
+      CHAMPS_PROFIL.forEach(c => { profilLocal[c.id] = localStorage.getItem(c.id) || ''; });
+      profilLocal.p_couleur = localStorage.getItem('p_couleur') || '#1a1a2e';
+      profilLocal.p_design = localStorage.getItem('p_design') || 'classique';
+      await sauvegarderProfilCloud(profilLocal);
+      devisCache = [];
+      await afficherHistorique();
+      await afficherHistoriqueMobile();
+      showToast('✅ Synchronisé');
+    } catch(e) {
+      showToast('❌ Erreur sync : ' + e.message);
+    }
+  }
+
+  async function sauvegarderProfil() {
+    sauvegarderProfilAuto();
+    afficherBadgeProfil();
+    const msgId = isMobile ? 'profil-message-mobile' : 'profil-message-desktop';
+    const div = document.getElementById(msgId);
+    if (getUserId()) {
+      try {
+        const profilLocal = {};
+        CHAMPS_PROFIL.forEach(c => { profilLocal[c.id] = localStorage.getItem(c.id) || ''; });
+        profilLocal.p_couleur = localStorage.getItem('p_couleur') || '#1a1a2e';
+        profilLocal.p_design = localStorage.getItem('p_design') || 'classique';
+        await sauvegarderProfilCloud(profilLocal);
+        if (div) { div.className = 'msg-succes'; div.textContent = '✅ Profil sauvegardé et synchronisé'; setTimeout(() => { div.textContent = ''; div.className = ''; }, 3000); }
+        showToast('✅ Profil synchronisé');
+      } catch(e) {
+        if (div) { div.className = 'msg-succes'; div.textContent = '✅ Profil sauvegardé (hors ligne)'; setTimeout(() => { div.textContent = ''; div.className = ''; }, 3000); }
+        showToast('✅ Profil sauvegardé');
+      }
+    } else {
+      if (div) { div.className = 'msg-succes'; div.textContent = '✅ Profil sauvegardé'; setTimeout(() => { div.textContent = ''; div.className = ''; }, 3000); }
+      showToast('✅ Profil sauvegardé');
+    }
+  }
+
+  async function initApp() {
+    const session = await initAuth();
+    if (session) {
+      document.getElementById('authOverlay').style.display = 'none';
+      afficherUserBar();
+      try {
+        const profilCloud = await chargerProfilCloud();
+        if (profilCloud) {
+          Object.entries(profilCloud).forEach(([k, v]) => localStorage.setItem(k, v));
+          chargerProfil(); afficherBadgeProfil(); rafraichirMiniatures();
+        }
+      } catch(e) {}
+    }
+    afficherHistorique();
+    afficherHistoriqueMobile();
+  }
+
+  initApp();
 </script>
 
 </body>
