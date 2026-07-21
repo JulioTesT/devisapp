@@ -10,7 +10,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; background: #f0f2f5; }
- 
+
     .app-desktop {
       display: grid;
       grid-template-columns: 280px 1fr 1fr;
@@ -19,17 +19,17 @@
       margin: 0 auto;
     }
     .app-mobile { display: none; }
- 
+
     @media (max-width: 768px) {
       .app-desktop { display: none; }
       .app-mobile { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     }
- 
+
     h1 { text-align: center; margin-bottom: 20px; color: #1a1a2e; font-size: 20px; }
     h2 { font-size: 11px; text-transform: uppercase; color: #888; margin: 16px 0 8px; letter-spacing: 1px; }
     .label-champ { font-size: 12px; color: #555; margin-bottom: 3px; display: block; }
     .obligatoire { color: #e05252; margin-left: 2px; }
- 
+
     input, textarea, select {
       width: 100%; padding: 9px 12px; border: 1px solid #ddd;
       border-radius: 6px; font-size: 14px; margin-bottom: 8px; transition: border-color .2s;
@@ -37,10 +37,58 @@
     input:focus, textarea:focus, select:focus { outline: none; border-color: #1a3a5c; }
     input.erreur, textarea.erreur { border-color: #e05252 !important; background: #fff5f5; }
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
- 
+
     .btn-principal {
       width: 100%; padding: 12px; background: #1a1a2e; color: white;
       border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 16px;
+    }
+    /* Split bouton PDF / Prévisualiser */
+    .btn-split-group { display: flex; gap: 6px; margin-top: 16px; }
+    .btn-split-pdf {
+      flex: 1; padding: 12px 8px; background: #1a1a2e; color: white;
+      border: none; border-radius: 8px; font-size: 14px; cursor: pointer;
+    }
+    .btn-split-pdf:hover { background: #2a2a4e; }
+    .btn-split-apercu {
+      flex: 1; padding: 12px 8px; background: #1a3a5c; color: white;
+      border: none; border-radius: 8px; font-size: 14px; cursor: pointer;
+    }
+    .btn-split-apercu:hover { background: #254d78; }
+
+    /* Modale prévisualisation devis */
+    .modal-apercu-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000; padding: 16px;
+    }
+    .modal-apercu {
+      background: #f0f2f5; border-radius: 12px;
+      width: min(680px, 100%); max-height: 92vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+    .modal-apercu-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: #1a1a2e; border-radius: 12px 12px 0 0; flex-shrink: 0;
+    }
+    .modal-apercu-header span { color: white; font-size: 14px; font-weight: bold; }
+    .modal-apercu-header-btns { display: flex; gap: 8px; }
+    .btn-modal-pdf {
+      padding: 7px 16px; background: #2d5a3d; color: white;
+      border: none; border-radius: 7px; font-size: 13px; cursor: pointer; font-weight: bold;
+    }
+    .btn-modal-pdf:hover { background: #3a7a50; }
+    .btn-modal-fermer {
+      padding: 7px 12px; background: rgba(255,255,255,0.15); color: white;
+      border: none; border-radius: 7px; font-size: 13px; cursor: pointer;
+    }
+    .btn-modal-fermer:hover { background: rgba(255,255,255,0.25); }
+    .modal-apercu-body {
+      flex: 1; overflow-y: auto; padding: 20px; display: flex; justify-content: center;
+    }
+    .modal-apercu-body svg {
+      width: 100%; max-width: 480px; height: auto;
+      border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
     .btn-sauvegarder {
       width: 100%; padding: 12px; background: #1a3a5c; color: white;
@@ -60,10 +108,6 @@
       width: 100%; padding: 12px; background: #2d5a3d; color: white;
       border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 16px;
     }
-    .btn-previsualiser {
-      width: 100%; padding: 10px; background: #2d5a3d; color: white;
-      border: none; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 8px;
-    }
     .total { background: #f8f9fa; border-radius: 8px; padding: 10px 14px; margin-top: 6px; font-size: 14px; color: #1a1a2e; }
     .total span { font-weight: bold; font-size: 16px; }
     .ligne-prestation { border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; margin-bottom: 8px; position: relative; }
@@ -73,59 +117,76 @@
     }
     .msg-erreur { background: #fff5f5; border: 1px solid #e05252; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #c0392b; margin-top: 8px; }
     .msg-succes { background: #f0fff4; border: 1px solid #2d5a3d; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #2d5a3d; margin-top: 8px; }
- 
+
     /* Design selector */
-    .design-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .design-card { border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; text-align: center; transition: all .2s; background: white; }
+    .design-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+    }
+    .design-card {
+      border: 2px solid #ddd; border-radius: 8px; padding: 8px;
+      cursor: pointer; text-align: center; transition: all .2s; background: white;
+    }
     .design-card:hover { border-color: #1a3a5c; }
     .design-card.actif { border-color: #1a3a5c; background: #f0f7ff; }
-    .design-card .design-preview { height: 60px; border-radius: 4px; margin-bottom: 6px; display: flex; flex-direction: column; overflow: hidden; }
-    .design-card .design-nom { font-size: 12px; font-weight: bold; color: #1a1a2e; }
-    .preview-classique { background: #1a1a2e; }
-    .preview-classique-body { background: white; flex: 1; padding: 4px; }
-    .preview-moderne { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .preview-moderne-body { background: white; flex: 1; }
-    .preview-minimaliste { background: white; border: 1px solid #ddd; flex: 1; }
-    .preview-corporate { background: #f8f9fa; flex: 1; border-left: 4px solid #1a3a5c; }
- 
+    .design-card .design-nom { font-size: 12px; font-weight: bold; color: #1a1a2e; margin-top: 6px; }
+
+    /* Miniature dynamique */
+    .design-thumb-wrap {
+      position: relative; height: 80px; border-radius: 4px; overflow: hidden;
+      background: #f5f5f5; margin-bottom: 2px;
+    }
+    .design-thumb-wrap svg { width: 100%; height: 100%; display: block; }
+    .btn-agrandir {
+      position: absolute; bottom: 4px; right: 4px;
+      background: rgba(0,0,0,0.45); color: white; border: none;
+      border-radius: 4px; font-size: 10px; padding: 2px 5px; cursor: pointer;
+      opacity: 0; transition: opacity .15s; line-height: 1.4;
+    }
+    .design-thumb-wrap:hover .btn-agrandir { opacity: 1; }
+
+    /* Modale agrandissement */
+    .modal-design-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2000; padding: 20px;
+    }
+    .modal-design {
+      background: white; border-radius: 12px;
+      width: min(520px, 100%); max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.3); overflow: hidden;
+    }
+    .modal-design-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; background: #1a1a2e; flex-shrink: 0;
+    }
+    .modal-design-header span { color: white; font-size: 14px; font-weight: bold; }
+    .modal-design-header button {
+      background: rgba(255,255,255,0.15); color: white; border: none;
+      border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 13px;
+    }
+    .modal-design-body { overflow-y: auto; padding: 20px; display: flex; justify-content: center; background: #f0f2f5; }
+    .modal-design-body svg { width: 100%; max-width: 480px; height: auto; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+
     .color-picker-zone {
       display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
       padding: 10px; background: #f8f9fa; border-radius: 8px;
     }
     .color-picker-zone label { font-size: 13px; color: #555; flex: 1; }
-    .color-picker-zone input[type="color"] { width: 40px; height: 36px; padding: 2px; border-radius: 6px; cursor: pointer; margin: 0; border: 1px solid #ddd; }
- 
-    .logo-upload-zone { border: 2px dashed #ddd; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; margin-bottom: 8px; transition: border-color .2s; }
+    .color-picker-zone input[type="color"] {
+      width: 40px; height: 36px; padding: 2px; border-radius: 6px;
+      cursor: pointer; margin: 0; border: 1px solid #ddd;
+    }
+
+    /* Logo upload */
+    .logo-upload-zone {
+      border: 2px dashed #ddd; border-radius: 8px; padding: 16px;
+      text-align: center; cursor: pointer; margin-bottom: 8px; transition: border-color .2s;
+    }
     .logo-upload-zone:hover { border-color: #1a3a5c; }
     .logo-upload-zone img { max-height: 60px; max-width: 100%; object-fit: contain; }
     .logo-upload-zone p { font-size: 12px; color: #888; margin-top: 6px; }
- 
-    /* Modal prévisualisation */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-    .modal-box { background: white; border-radius: 12px; width: 100%; max-width: 680px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
-    .modal-header { padding: 16px 20px; background: #1a1a2e; color: white; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-    .modal-header h3 { font-size: 15px; }
-    .modal-close { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-    .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
-    .modal-footer { padding: 12px 20px; border-top: 1px solid #e0e0e0; display: flex; gap: 8px; flex-shrink: 0; }
-    .modal-footer button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
-    .btn-modal-dl { background: #1a1a2e; color: white; }
-    .btn-modal-cancel { background: #f0f2f5; color: #1a1a2e; border: 1px solid #ddd !important; }
- 
-    .apercu-devis { font-family: Arial, sans-serif; font-size: 12px; color: #1a1a2e; }
-    .apercu-bandeau { padding: 12px 16px; color: white; margin-bottom: 16px; border-radius: 4px; }
-    .apercu-bandeau h2 { font-size: 18px; margin-bottom: 2px; }
-    .apercu-bandeau span { font-size: 10px; opacity: .8; }
-    .apercu-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .apercu-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; opacity: .6; }
-    .apercu-nom { font-weight: bold; font-size: 13px; }
-    .apercu-info { font-size: 11px; color: #555; line-height: 1.6; }
-    .apercu-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-    .apercu-table th { font-size: 9px; text-transform: uppercase; padding: 6px 8px; text-align: left; color: white; }
-    .apercu-table td { font-size: 11px; padding: 6px 8px; border-bottom: 1px solid #f0f0f0; }
-    .apercu-total { text-align: right; font-weight: bold; font-size: 13px; padding: 8px; border-radius: 4px; color: white; margin-bottom: 12px; }
-    .apercu-mentions { font-size: 9px; color: #999; line-height: 1.6; font-style: italic; }
- 
+
     /* Historique */
     .devis-card { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; transition: background .15s; }
     .devis-card:hover { background: rgba(255,255,255,.12); }
@@ -144,7 +205,7 @@
     .historique-vide { text-align: center; padding: 40px 16px; opacity: .4; font-size: 13px; }
     .btn-suppr-selection { width: 100%; padding: 8px; background: #e05252; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; display: none; }
     .btn-suppr-selection.visible { display: block; }
- 
+
     /* Chat */
     .chat-header { background: #1a1a2e; color: white; padding: 16px 20px; font-size: 15px; font-weight: bold; flex-shrink: 0; }
     .chat-header span { font-size: 12px; opacity: .6; display: block; margin-top: 2px; }
@@ -160,10 +221,10 @@
     .chat-input-zone textarea { flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: none; margin: 0; font-family: Arial, sans-serif; }
     .btn-envoyer { padding: 10px 16px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; align-self: flex-end; }
     .btn-appliquer { margin-top: 8px; padding: 6px 12px; background: #2d5a3d; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; }
- 
-    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1a3a5c; color: white; padding: 10px 20px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9998; }
+
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1a3a5c; color: white; padding: 10px 20px; border-radius: 8px; font-size: 14px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9999; }
     .toast.show { opacity: 1; }
- 
+
     /* PC */
     .colonne-historique { background: #1a1a2e; color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
     .col-header { padding: 16px; font-size: 13px; font-weight: bold; letter-spacing: .05em; border-bottom: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
@@ -172,17 +233,17 @@
     .historique-actions { padding: 10px 12px; border-top: 1px solid rgba(255,255,255,.1); flex-shrink: 0; }
     .colonne-form { background: white; height: 100vh; overflow-y: auto; border-right: 1px solid #e0e0e0; }
     .colonne-chat { display: flex; flex-direction: column; height: 100vh; background: #f8f9fa; }
- 
+
     .form-tabs { display: flex; border-bottom: 1px solid #e0e0e0; background: white; flex-shrink: 0; position: sticky; top: 0; z-index: 10; }
     .form-tab { flex: 1; padding: 12px; border: none; background: transparent; font-size: 13px; cursor: pointer; color: #888; border-bottom: 3px solid transparent; }
     .form-tab.actif { color: #1a1a2e; border-bottom: 3px solid #1a1a2e; font-weight: bold; }
     .form-panel { display: none; padding: 24px; }
     .form-panel.actif { display: block; }
- 
+
     .profil-badge { background: #f0f7ff; border: 1px solid #1a3a5c; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #1a1a2e; }
     .profil-badge b { display: block; font-size: 15px; margin-bottom: 4px; }
     .profil-badge span { opacity: .6; font-size: 12px; }
- 
+
     /* Mobile */
     .mobile-content { flex: 1; overflow: hidden; position: relative; }
     .mobile-panel { position: absolute; inset: 0; overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity .2s; }
@@ -193,23 +254,48 @@
     .mobile-panel.profil { background: white; padding: 20px 16px 100px; }
     .mobile-panel.chat { background: #f8f9fa; display: flex; flex-direction: column; }
     .mobile-panel.chat .chat-messages { flex: 1; padding-bottom: 16px; }
- 
+
     .tab-bar { display: flex; background: white; border-top: 1px solid #e0e0e0; flex-shrink: 0; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
     .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 0; border: none; background: transparent; cursor: pointer; color: #aaa; transition: color .2s; position: relative; border-top: 3px solid transparent; }
     .tab-btn .tab-icon { font-size: 20px; line-height: 1; }
     .tab-btn .tab-label { font-size: 9px; font-weight: 500; margin-top: 2px; }
     .tab-btn.actif { color: #1a1a2e; border-top: 3px solid #1a1a2e; }
     .tab-btn.actif .tab-label { font-weight: 700; }
- 
+
     .mobile-header { background: #1a1a2e; color: white; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .mobile-header-title { font-size: 16px; font-weight: bold; }
     .mobile-header-sub { font-size: 11px; opacity: .6; }
   </style>
 </head>
 <body>
- 
+
 <div class="toast" id="toast"></div>
- 
+
+<!-- Modale prévisualisation devis -->
+<div class="modal-apercu-overlay" id="modalApercu" style="display:none" onclick="if(event.target===this)fermerApercu()">
+  <div class="modal-apercu">
+    <div class="modal-apercu-header">
+      <span>👁️ Prévisualisation du devis</span>
+      <div class="modal-apercu-header-btns">
+        <button class="btn-modal-pdf" onclick="genererDevis()">📥 Générer le PDF</button>
+        <button class="btn-modal-fermer" onclick="fermerApercu()">✕ Fermer</button>
+      </div>
+    </div>
+    <div class="modal-apercu-body" id="modalApercuBody"></div>
+  </div>
+</div>
+
+<!-- Modale aperçu design agrandi -->
+<div class="modal-design-overlay" id="modalDesign" style="display:none" onclick="if(event.target===this)fermerModalDesign()">
+  <div class="modal-design">
+    <div class="modal-design-header">
+      <span id="modalDesignTitre">Aperçu</span>
+      <button onclick="fermerModalDesign()">✕ Fermer</button>
+    </div>
+    <div class="modal-design-body" id="modalDesignBody"></div>
+  </div>
+</div>
+
 <!-- VERSION PC -->
 <div class="app-desktop">
   <div class="colonne-historique">
@@ -223,22 +309,26 @@
       </button>
     </div>
   </div>
- 
+
   <div class="colonne-form">
     <div class="form-tabs">
       <button class="form-tab actif" id="pc-tab-devis" onclick="changerTabPC('devis')">📄 Devis</button>
       <button class="form-tab" id="pc-tab-profil" onclick="changerTabPC('profil')">👤 Profil</button>
     </div>
+
     <div class="form-panel actif" id="pc-panel-devis">
       <div id="profil-badge-desktop"></div>
       <h1>📄 Nouveau devis</h1>
       <div id="form-content-desktop"></div>
       <div id="erreurValidation-desktop" class="msg-erreur" style="display:none;"></div>
-      <button class="btn-principal" onclick="genererDevis()">📥 Générer le devis PDF</button>
-      <button class="btn-previsualiser" onclick="previsualiserDevis()">👁️ Prévisualiser</button>
+      <div class="btn-split-group">
+        <button class="btn-split-pdf" onclick="genererDevis()">📥 Générer PDF</button>
+        <button class="btn-split-apercu" onclick="previsualiserDevis()">👁️ Prévisualiser</button>
+      </div>
       <button class="btn-sauvegarder" id="btnSauvegarder" onclick="sauvegarderDevisCloud()">☁️ Sauvegarder</button>
       <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
     </div>
+
     <div class="form-panel" id="pc-panel-profil">
       <h1>👤 Mon profil</h1>
       <div id="form-profil-desktop"></div>
@@ -246,7 +336,7 @@
       <button class="btn-profil-save" onclick="sauvegarderProfil()">💾 Sauvegarder le profil</button>
     </div>
   </div>
- 
+
   <div class="colonne-chat">
     <div class="chat-header">🤖 Assistant DevisApp<span>Décris ta prestation ou pose une question</span></div>
     <div class="chat-messages" id="chatMessages">
@@ -270,7 +360,7 @@
     </div>
   </div>
 </div>
- 
+
 <!-- VERSION MOBILE -->
 <div class="app-mobile">
   <div class="mobile-header">
@@ -279,37 +369,44 @@
       <div class="mobile-header-sub" id="mobileSub">Nouveau devis</div>
     </div>
   </div>
+
   <div class="mobile-content">
     <div class="mobile-panel historique" id="panel-historique">
       <h2>Devis sauvegardés</h2>
-      <div id="historiqueDevisMobile"><div class="historique-vide">📭 Aucun devis sauvegardé</div></div>
+      <div id="historiqueDevisMobile">
+        <div class="historique-vide">📭 Aucun devis sauvegardé</div>
+      </div>
       <div style="margin-top:8px;">
         <button class="btn-suppr-selection" id="btnSupprSelectionMobile" onclick="supprimerSelectionMobile()">
           🗑️ Supprimer (<span id="nbSelectionMobile">0</span>)
         </button>
       </div>
     </div>
- 
+
     <div class="mobile-panel formulaire actif" id="panel-formulaire">
       <div id="profil-badge-mobile"></div>
       <div id="form-content-mobile"></div>
       <div id="erreurValidation-mobile" class="msg-erreur" style="display:none;"></div>
-      <button class="btn-principal" onclick="genererDevis()">📥 Générer PDF</button>
-      <button class="btn-previsualiser" onclick="previsualiserDevis()">👁️ Prévisualiser</button>
+      <div class="btn-split-group">
+        <button class="btn-split-pdf" onclick="genererDevis()">📥 Générer PDF</button>
+        <button class="btn-split-apercu" onclick="previsualiserDevis()">👁️ Prévisualiser</button>
+      </div>
       <button class="btn-sauvegarder" id="btnSauvegarderMobile" onclick="sauvegarderDevisCloud()" style="margin-top:8px;">☁️ Sauvegarder</button>
       <button class="btn-nouveau" onclick="nouveauDevis()">✚ Nouveau devis</button>
     </div>
- 
+
     <div class="mobile-panel profil" id="panel-profil">
       <h1>👤 Mon profil</h1>
       <div id="form-profil-mobile"></div>
       <div id="profil-message-mobile"></div>
       <button class="btn-profil-save" onclick="sauvegarderProfil()">💾 Sauvegarder le profil</button>
     </div>
- 
+
     <div class="mobile-panel chat" id="panel-chat">
       <div class="chat-messages" id="chatMessagesMobile">
-        <div class="msg assistant">Bonjour ! Je peux générer ton devis ou répondre à tes questions.</div>
+        <div class="msg assistant">
+          Bonjour ! Je peux générer ton devis ou répondre à tes questions.
+        </div>
       </div>
       <div class="exemples">
         <button class="exemple-btn" onclick="envoyerExempleMobile(this)">Clim, 4h + 250€</button>
@@ -323,7 +420,7 @@
       </div>
     </div>
   </div>
- 
+
   <div class="tab-bar">
     <button class="tab-btn" id="tab-historique" onclick="changerOnglet('historique')">
       <span class="tab-icon">📁</span><span class="tab-label">Historique</span>
@@ -339,10 +436,13 @@
     </button>
   </div>
 </div>
- 
+
 <script>
   const isMobile = window.innerWidth <= 768;
- 
+
+  // ══════════════════════════════════════
+  // PROFIL
+  // ══════════════════════════════════════
   const CHAMPS_PROFIL = [
     { id: 'p_nom', label: 'Nom / raison sociale', placeholder: 'Jean Dupont', obligatoire: true },
     { id: 'p_metier', label: 'Métier / activité', placeholder: 'Électricien, Graphiste...', obligatoire: true },
@@ -355,59 +455,71 @@
     { id: 'p_validite', label: 'Validité des devis par défaut', placeholder: '30 jours' },
     { id: 'p_mention', label: 'Mention légale personnalisée', placeholder: 'Optionnel' },
   ];
- 
+
   const DESIGNS = [
     { id: 'classique', nom: 'Classique', emoji: '🏛️' },
     { id: 'moderne', nom: 'Moderne', emoji: '✨' },
     { id: 'minimaliste', nom: 'Minimaliste', emoji: '⬜' },
     { id: 'corporate', nom: 'Corporate', emoji: '💼' },
   ];
- 
+
   function getProfilFormHTML() {
     let html = CHAMPS_PROFIL.map(c => `
       <label class="label-champ">${c.label}${c.obligatoire ? ' <span class="obligatoire">*</span>' : ''}</label>
       <input type="text" id="${c.id}" placeholder="${c.placeholder}" oninput="sauvegarderProfilAuto()">
     `).join('');
+
+    // Logo
     html += `
       <h2>Logo</h2>
       <div class="logo-upload-zone" onclick="document.getElementById('logoInput').click()">
-        <div id="logoPreview"><p>📷 Cliquer pour importer un logo (PNG, JPG)</p></div>
+        <div id="logoPreview">
+          <p>📷 Cliquer pour importer un logo (PNG, JPG)</p>
+        </div>
       </div>
       <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="importerLogo(this)">
       <button style="width:100%;padding:8px;background:#f0f2f5;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:12px;margin-bottom:8px;" onclick="supprimerLogo()">🗑️ Supprimer le logo</button>
+
       <h2>Style de devis</h2>
       <div class="design-grid">
         ${DESIGNS.map(d => `
           <div class="design-card" id="design-card-${d.id}" onclick="choisirDesign('${d.id}')">
-            <div class="design-preview preview-${d.id}"><div class="preview-${d.id}-body"></div></div>
+            <div class="design-thumb-wrap" id="thumb-${d.id}">
+              <!-- SVG injecté dynamiquement -->
+              <button class="btn-agrandir" onclick="event.stopPropagation(); agrandirDesign('${d.id}')">⤢ Agrandir</button>
+            </div>
             <div class="design-nom">${d.emoji} ${d.nom}</div>
           </div>
         `).join('')}
       </div>
+
       <h2>Couleur principale</h2>
       <div class="color-picker-zone">
         <label>Couleur du bandeau et des accents</label>
-        <input type="color" id="p_couleur" value="#1a1a2e" onchange="sauvegarderProfilAuto()">
+        <input type="color" id="p_couleur" value="#1a1a2e" onchange="sauvegarderProfilAuto(); aperçuCouleur(this.value)">
       </div>
     `;
     return html;
   }
- 
+
   function chargerProfil() {
     CHAMPS_PROFIL.forEach(c => {
       const v = localStorage.getItem(c.id);
       const el = document.getElementById(c.id);
       if (v && el) el.value = v;
     });
+    // Couleur
     const couleur = localStorage.getItem('p_couleur') || '#1a1a2e';
     const couleurEl = document.getElementById('p_couleur');
     if (couleurEl) couleurEl.value = couleur;
+    // Design
     const design = localStorage.getItem('p_design') || 'classique';
     choisirDesign(design, false);
+    // Logo
     const logo = localStorage.getItem('p_logo');
     if (logo) afficherLogoPreview(logo);
   }
- 
+
   function sauvegarderProfilAuto() {
     CHAMPS_PROFIL.forEach(c => {
       const el = document.getElementById(c.id);
@@ -416,7 +528,7 @@
     const couleur = document.getElementById('p_couleur');
     if (couleur) localStorage.setItem('p_couleur', couleur.value);
   }
- 
+
   function sauvegarderProfil() {
     sauvegarderProfilAuto();
     afficherBadgeProfil();
@@ -429,7 +541,7 @@
     }
     showToast('✅ Profil sauvegardé');
   }
- 
+
   function getProfil() {
     const p = {};
     CHAMPS_PROFIL.forEach(c => { p[c.id] = localStorage.getItem(c.id) || ''; });
@@ -438,7 +550,7 @@
     p.logo = localStorage.getItem('p_logo') || null;
     return p;
   }
- 
+
   function afficherBadgeProfil() {
     const p = getProfil();
     if (!p.p_nom && !p.p_metier) return;
@@ -448,14 +560,332 @@
       if (el) el.innerHTML = html;
     });
   }
- 
+
   function choisirDesign(id, save=true) {
     document.querySelectorAll('.design-card').forEach(c => c.classList.remove('actif'));
     const card = document.getElementById('design-card-' + id);
     if (card) card.classList.add('actif');
-    if (save) { localStorage.setItem('p_design', id); showToast('Design ' + id + ' sélectionné'); }
+    if (save) {
+      localStorage.setItem('p_design', id);
+      showToast('Design ' + id + ' sélectionné');
+      rafraichirMiniatures();
+    }
   }
- 
+
+  function aperçuCouleur(couleur) { rafraichirMiniatures(); }
+
+  // ── MINIATURES DESIGN ──
+  function getCouleurActuelle() {
+    const el = document.getElementById('p_couleur');
+    return (el ? el.value : null) || localStorage.getItem('p_couleur') || '#1a1a2e';
+  }
+
+  function rafraichirMiniatures() {
+    const c = getCouleurActuelle();
+    DESIGNS.forEach(d => {
+      const wrap = document.getElementById('thumb-' + d.id);
+      if (!wrap) return;
+      // Garder le bouton agrandir
+      const btn = wrap.querySelector('.btn-agrandir');
+      const svgExistant = wrap.querySelector('svg');
+      if (svgExistant) svgExistant.remove();
+      const svg = genererSVGMiniature(d.id, c);
+      wrap.insertBefore(svg, btn);
+    });
+  }
+
+  function genererSVGMiniature(design, c) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 210 148');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const _r = (tag, attrs, parent) => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+      if (parent) parent.appendChild(el);
+      return el;
+    };
+    const rect = (x,y,w,h,fill,rx=0) => _r('rect',{x,y,width:w,height:h,fill,rx},svg);
+    const text = (x,y,content,size,fill,weight='normal') => {
+      const t = _r('text',{x,y,'font-size':size,fill,'font-weight':weight,'font-family':'Arial,sans-serif'},svg);
+      t.textContent = content; return t;
+    };
+    const line = (x1,y1,x2,y2,stroke='#ddd',sw=0.5) => _r('line',{x1,y1,x2,y2,stroke,'stroke-width':sw},svg);
+
+    // Fond blanc
+    rect(0,0,210,148,'white');
+
+    if (design === 'classique') {
+      rect(0,0,210,22,c);
+      text(6,15,'DEVIS',10,'white','bold');
+      text(60,15,'N° 2026-001  •  01/01/2026',5,'rgba(255,255,255,.8)');
+      // Infos
+      rect(6,26,90,3,'#f0f0f0',1); rect(6,31,70,3,'#f0f0f0',1); rect(6,36,55,3,'#f0f0f0',1);
+      rect(120,26,80,3,'#f0f0f0',1); rect(120,31,60,3,'#f0f0f0',1);
+      // Tableau header
+      rect(6,48,198,7,`${hexShade(c,0.9)}`,1);
+      text(8,54,'DÉSIGNATION',4,c,'bold'); text(140,54,'QTÉ',4,c,'bold'); text(158,54,'P.U.',4,c,'bold'); text(176,54,'TOTAL',4,c,'bold');
+      // Lignes
+      [[6,65,140,3],[6,71,140,3],[6,77,110,3]].forEach(([x,y,w,h]) => rect(x,y,w,h,'#f0f0f0',1));
+      [65,71,77].forEach(y => { rect(150,y,14,3,'#e8e8e8',1); rect(168,y,30,3,'#e8e8e8',1); rect(186,y,14,3,'#e8e8e8',1); });
+      line(6,83,204,83);
+      rect(140,85,64,8,c,1); text(144,91,'TOTAL HT',4,'white','bold'); text(178,91,'---',4,'white');
+      // Mentions
+      rect(6,98,120,2,'#eee',1); rect(6,102,100,2,'#eee',1); rect(6,106,140,2,'#eee',1);
+    }
+
+    else if (design === 'moderne') {
+      const c2 = hexShade(c, 1.4);
+      // Dégradé simulé
+      rect(0,0,105,28,c2); rect(105,0,105,28,c);
+      text(6,18,'DEVIS',11,'white','bold'); text(6,25,`N° 2026-001`,4,'rgba(255,255,255,.85)');
+      text(140,25,'01/01/2026',4,'rgba(255,255,255,.85)');
+      // Infos 2 colonnes
+      text(6,34,'DE',3,c,'bold'); text(110,34,'POUR',3,c,'bold');
+      rect(6,37,85,3,'#f0f0f0',1); rect(6,42,70,3,'#f0f0f0',1); rect(6,47,55,3,'#f0f0f0',1);
+      rect(110,37,85,3,'#f0f0f0',1); rect(110,42,65,3,'#f0f0f0',1);
+      // Tableau
+      rect(6,55,198,7,c,1);
+      text(8,61,'DÉSIGNATION',4,'white','bold'); text(140,61,'QTÉ',4,'white','bold'); text(158,61,'P.U.',4,'white','bold'); text(176,61,'TOTAL',4,'white','bold');
+      [[6,72,140,3],[6,78,140,3],[6,84,110,3]].forEach(([x,y,w]) => rect(x,y,w,3,'#f0f0f0',1));
+      [72,78,84].forEach(y => { rect(150,y,14,3,'#e8e8e8',1); rect(168,y,30,3,'#e8e8e8',1); rect(186,y,14,3,'#e8e8e8',1); });
+      line(6,90,204,90);
+      rect(140,92,64,8,c,1); text(144,98,'TOTAL HT',4,'white','bold');
+      rect(6,105,120,2,'#eee',1); rect(6,109,100,2,'#eee',1);
+    }
+
+    else if (design === 'minimaliste') {
+      line(6,16,204,16,'#bbb',0.8);
+      text(6,13,'devis',9,'#555','300'); text(80,13,`N° 2026-001  —  01/01/2026`,4,'#aaa');
+      rect(6,22,85,3,'#f0f0f0',1); rect(6,27,70,3,'#f0f0f0',1); rect(6,32,55,3,'#f0f0f0',1);
+      rect(120,22,80,3,'#f0f0f0',1); rect(120,27,60,3,'#f0f0f0',1);
+      line(6,40,204,40,'#ccc',0.5);
+      text(8,47,'DÉSIGNATION',4,'#666','bold'); text(140,47,'QTÉ',4,'#666','bold'); text(158,47,'P.U.',4,'#666','bold'); text(176,47,'TOTAL',4,'#666','bold');
+      line(6,50,204,50,'#ddd',0.5);
+      [55,63,71].forEach(y => {
+        rect(6,y,130,3,'#f0f0f0',1); rect(150,y,14,3,'#e8e8e8',1); rect(168,y,30,3,'#e8e8e8',1); rect(186,y,14,3,'#e8e8e8',1);
+        line(6,y+5,204,y+5,'#eee',0.3);
+      });
+      line(6,79,204,79,'#ccc',0.5);
+      text(144,86,'TOTAL HT',5,'#555','bold');
+      rect(6,93,120,2,'#eee',1); rect(6,97,100,2,'#eee',1);
+    }
+
+    else if (design === 'corporate') {
+      rect(0,0,8,148,c); // barre latérale
+      text(14,14,'DEVIS',11,c,'bold');
+      text(14,20,`N° 2026-001  •  01/01/2026`,4,'#888');
+      _r('line',{x1:14,y1:24,x2:204,y2:24,stroke:c,'stroke-width':0.8},svg);
+      text(14,31,'PRESTATAIRE',3,c,'bold'); text(110,31,'CLIENT',3,c,'bold');
+      rect(14,34,85,3,'#f0f0f0',1); rect(14,39,70,3,'#f0f0f0',1); rect(14,44,55,3,'#f0f0f0',1);
+      rect(110,34,85,3,'#f0f0f0',1); rect(110,39,65,3,'#f0f0f0',1);
+      rect(14,53,191,7,'#f0f2f5',1);
+      _r('line',{x1:14,y1:53,x2:205,y2:53,stroke:c,'stroke-width':0.8},svg);
+      text(16,59,'DÉSIGNATION',4,c,'bold'); text(140,59,'QTÉ',4,c,'bold'); text(158,59,'P.U.',4,c,'bold'); text(176,59,'TOTAL',4,c,'bold');
+      [66,73,80].forEach(y => {
+        rect(16,y,120,3,'#f0f0f0',1); rect(148,y,14,3,'#e8e8e8',1); rect(166,y,30,3,'#e8e8e8',1); rect(184,y,16,3,'#e8e8e8',1);
+        if(y<80) _r('line',{x1:14,y1:y+5,x2:205,y2:y+5,stroke:'#eee','stroke-width':0.3},svg);
+      });
+      _r('line',{x1:14,y1:86,x2:205,y2:86,stroke:c,'stroke-width':0.8},svg);
+      rect(142,88,63,9,c,1); text(145,95,'TOTAL HT',4,'white','bold');
+      rect(14,102,120,2,'#eee',1); rect(14,106,100,2,'#eee',1);
+    }
+
+    return svg;
+  }
+
+  function hexShade(hex, factor) {
+    // Éclaircit (>1) ou assombrit (<1) une couleur hex
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    const clamp = v => Math.min(255, Math.max(0, Math.round(v)));
+    return `rgb(${clamp(r*factor)},${clamp(g*factor)},${clamp(b*factor)})`;
+  }
+
+  function agrandirDesign(id) {
+    const c = getCouleurActuelle();
+    const nom = DESIGNS.find(d => d.id === id)?.nom || id;
+    document.getElementById('modalDesignTitre').textContent = `Aperçu — ${nom}`;
+    const body = document.getElementById('modalDesignBody');
+    body.innerHTML = '';
+    const svg = genererSVGMiniature(id, c);
+    svg.setAttribute('viewBox', '0 0 210 297'); // Proportion A4 pour le grand
+    // Regénérer en A4
+    const svgA4 = genererSVGA4(id, c);
+    body.appendChild(svgA4);
+    document.getElementById('modalDesign').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function fermerModalDesign() {
+    document.getElementById('modalDesign').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function genererSVGA4(design, c, data) {
+    // Si data fourni, utilise les vraies données, sinon données exemple
+    const ex = data || {};
+    const nom = ex.monNom || 'Jean Dupont';
+    const adresse = ex.monAdresse || '12 rue de la Paix, 75001 Paris';
+    const email = ex.monEmail || 'contact@exemple.fr';
+    const tel = ex.monTel || '06 12 34 56 78';
+    const siret = ex.monSiret || '123 456 789 00012';
+    const urssaf = ex.monUrssaf || '';
+    const clientNom = ex.clientNom || 'Société Client';
+    const clientAdresse = ex.clientAdresse || '45 avenue des Fleurs, 69000 Lyon';
+    const numero = ex.numeroDevis || '2026-001';
+    const date = ex.dateFr || '01/01/2026';
+    const objet = ex.objetDevis || '';
+    const validite = ex.validite || '30 jours';
+    const fmtMontant = n => n.toLocaleString('fr-FR',{minimumFractionDigits:2}) + ' €';
+    const lignesData = ex.prestations || [
+      {desc:'Conception et intégration site web', qte:1, pu:1200, sousTotal:1200},
+      {desc:'Maintenance mensuelle (3 mois)', qte:3, pu:150, sousTotal:450},
+      {desc:'Formation utilisateur', qte:2, pu:80, sousTotal:160},
+    ];
+    const total = ex.totalGeneral != null ? ex.totalGeneral : 1810;
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 210 297');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', 'auto');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const _r = (tag, attrs, parent) => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+      if (parent) parent.appendChild(el);
+      return el;
+    };
+    const rect = (x,y,w,h,fill,rx=0) => _r('rect',{x,y,width:w,height:h,fill,rx},svg);
+    const text = (x,y,content,size,fill,weight='normal',style='') => {
+      const t = _r('text',{x,y,'font-size':size,fill,'font-weight':weight,'font-family':'Arial,sans-serif','font-style':style||'normal'},svg);
+      t.textContent = String(content).substring(0,52); return t;
+    };
+    const line = (x1,y1,x2,y2,stroke='#ddd',sw=0.5) => _r('line',{x1,y1,x2,y2,stroke,'stroke-width':sw},svg);
+
+    const drawLignes = (startY, xL, xQ, xPU, xT, lineW, sepColor) => {
+      let y = startY;
+      lignesData.forEach((l, i) => {
+        const desc = String(l.desc || '').substring(0, 45);
+        text(xL+2, y, desc, 6, '#333');
+        text(xQ, y, String(l.qte), 6, '#333');
+        text(xPU, y, fmtMontant(l.pu), 6, '#333');
+        text(xT, y, fmtMontant(l.sousTotal), 6, '#333');
+        y += 8;
+        if (i < lignesData.length - 1) line(xL, y-2, xL+lineW, y-2, sepColor, 0.3);
+      });
+      return y;
+    };
+
+    const drawMentions = (y, xL) => {
+      text(xL, y, 'TVA non applicable — article 293 B du CGI', 5, '#aaa'); y+=5;
+      text(xL, y, `Devis valable ${validite} à compter de sa date d'émission.`, 5, '#aaa'); y+=5;
+      text(xL, y, 'En cas d\'acceptation, retourner signé avec "Bon pour accord".', 5, '#aaa');
+    };
+
+    rect(0,0,210,297,'white');
+
+    if (design === 'classique') {
+      rect(0,0,210,28,c);
+      text(14,20,'DEVIS',14,'white','bold');
+      text(14,26,`N° ${numero}  •  ${date}`,7,'rgba(255,255,255,.85)');
+      let y = 36;
+      if (objet) { text(14,y,`Objet : ${objet}`,7,'#888','normal','italic'); y+=8; }
+      text(14,y+4,'PRESTATAIRE',5,c,'bold'); text(120,y+4,'CLIENT',5,c,'bold');
+      let yp = y+11;
+      text(14,yp,nom,7,'#333'); yp+=6;
+      if (adresse) { text(14,yp,adresse,6,'#555'); yp+=6; }
+      if (email) { text(14,yp,email,6,'#555'); yp+=6; }
+      if (tel) { text(14,yp,tel,6,'#555'); yp+=6; }
+      text(14,yp,`SIRET : ${siret}`,5,'#999');
+      text(120,y+11,clientNom,7,'#333');
+      if (clientAdresse) text(120,y+17,clientAdresse,6,'#555');
+      const ySep = y+50; line(14,ySep,196,ySep,'#ccc');
+      const yTab = ySep+4; rect(14,yTab,182,8,'#f0f0f0',1);
+      text(16,yTab+6,'DÉSIGNATION',5,c,'bold'); text(132,yTab+6,'QTÉ',5,c,'bold'); text(150,yTab+6,'P.U. HT',5,c,'bold'); text(172,yTab+6,'TOTAL HT',5,c,'bold');
+      let yL = drawLignes(yTab+14, 14, 134, 150, 172, 182, '#eee');
+      line(14,yL,196,yL,'#ccc'); yL+=4;
+      rect(140,yL,56,10,c,1); text(143,yL+7,'TOTAL HT',5,'white','bold'); text(170,yL+7,fmtMontant(total),5,'white','bold');
+      drawMentions(yL+18, 14);
+    }
+
+    else if (design === 'moderne') {
+      const c2 = hexShade(c, 1.4);
+      rect(0,0,105,35,c2); rect(105,0,105,35,c);
+      text(14,22,'DEVIS',14,'white','bold'); text(14,30,`N° ${numero}`,7,'rgba(255,255,255,.85)');
+      text(150,30,date,7,'rgba(255,255,255,.85)');
+      if (objet) text(110,22,objet,6,'rgba(255,255,255,.8)');
+      text(14,44,'DE',5,c,'bold'); text(120,44,'POUR',5,c,'bold');
+      let yp=51;
+      text(14,yp,nom,7,'#333'); yp+=6;
+      if (adresse) { text(14,yp,adresse,6,'#555'); yp+=6; }
+      if (email) { text(14,yp,email,6,'#555'); yp+=6; }
+      text(14,yp,`SIRET : ${siret}`,5,'#999');
+      text(120,51,clientNom,7,'#333');
+      if (clientAdresse) text(120,57,clientAdresse,6,'#555');
+      const yTab=78; rect(14,yTab,182,8,c,1);
+      text(16,yTab+6,'DÉSIGNATION',5,'white','bold'); text(132,yTab+6,'QTÉ',5,'white','bold'); text(150,yTab+6,'P.U. HT',5,'white','bold'); text(172,yTab+6,'TOTAL HT',5,'white','bold');
+      let yL = drawLignes(yTab+14, 14, 134, 150, 172, 182, '#eee');
+      line(14,yL,196,yL,'#ccc'); yL+=4;
+      rect(140,yL,56,10,c,1); text(143,yL+7,'TOTAL HT',5,'white','bold'); text(170,yL+7,fmtMontant(total),5,'white','bold');
+      drawMentions(yL+18, 14);
+    }
+
+    else if (design === 'minimaliste') {
+      line(14,18,196,18,'#bbb',0.8);
+      text(14,15,'devis',13,'#555'); text(80,15,`N° ${numero}  —  ${date}`,6,'#aaa');
+      let yp=26;
+      text(14,yp,nom,7,'#333'); yp+=6;
+      if (adresse) { text(14,yp,adresse,6,'#555'); yp+=6; }
+      if (email) { text(14,yp,email,6,'#555'); yp+=6; }
+      text(14,yp,`SIRET : ${siret}`,5,'#bbb'); yp+=6;
+      if (objet) { text(14,yp,`Objet : ${objet}`,6,'#888','normal','italic'); yp+=6; }
+      text(120,26,'À l\'attention de :',5,'#888');
+      text(120,32,clientNom,7,'#333');
+      if (clientAdresse) text(120,38,clientAdresse,6,'#555');
+      const ySep = Math.max(yp, 48); line(14,ySep,196,ySep,'#ccc',0.5);
+      let y = ySep+8;
+      text(16,y,'DÉSIGNATION',5,'#666','bold'); text(132,y,'QTÉ',5,'#666','bold'); text(150,y,'P.U. HT',5,'#666','bold'); text(172,y,'TOTAL HT',5,'#666','bold'); y+=3;
+      line(14,y,196,y,'#ddd',0.5); y+=6;
+      let yL = drawLignes(y, 14, 134, 150, 172, 182, '#eee');
+      line(14,yL,196,yL,'#ccc'); yL+=6;
+      text(140,yL,'TOTAL HT',6,'#555','bold'); text(172,yL,fmtMontant(total),6,'#555','bold');
+      drawMentions(yL+14, 14);
+    }
+
+    else if (design === 'corporate') {
+      rect(0,0,8,297,c);
+      text(20,18,'DEVIS',14,c,'bold'); text(20,25,`N° ${numero}  •  ${date}`,7,'#888');
+      if (objet) text(20,31,`Objet : ${objet}`,6,'#888','normal','italic');
+      _r('line',{x1:20,y1:34,x2:204,y2:34,stroke:c,'stroke-width':0.8},svg);
+      let y=44;
+      text(20,y,'PRESTATAIRE',5,c,'bold'); text(120,y,'CLIENT',5,c,'bold'); y+=7;
+      let yp=y;
+      text(20,yp,nom,7,'#333'); yp+=6;
+      if (adresse) { text(20,yp,adresse,6,'#555'); yp+=6; }
+      if (email) { text(20,yp,email,6,'#555'); yp+=6; }
+      if (tel) { text(20,yp,tel,6,'#555'); yp+=6; }
+      text(20,yp,`SIRET : ${siret}`,5,'#999');
+      text(120,y,clientNom,7,'#333');
+      if (clientAdresse) text(120,y+6,clientAdresse,6,'#555');
+      const yTab = Math.max(yp+8, 80);
+      rect(20,yTab,185,8,'#f0f2f5',1);
+      _r('line',{x1:20,y1:yTab,x2:205,y2:yTab,stroke:c,'stroke-width':0.8},svg);
+      text(22,yTab+6,'DÉSIGNATION',5,c,'bold'); text(134,yTab+6,'QTÉ',5,c,'bold'); text(152,yTab+6,'P.U. HT',5,c,'bold'); text(174,yTab+6,'TOTAL HT',5,c,'bold');
+      let yL = drawLignes(yTab+14, 20, 136, 152, 174, 185, '#eee');
+      _r('line',{x1:20,y1:yL,x2:205,y2:yL,stroke:c,'stroke-width':0.8},svg); yL+=4;
+      rect(142,yL,63,10,c,1); text(145,yL+7,'TOTAL HT',5,'white','bold'); text(174,yL+7,fmtMontant(total),5,'white','bold');
+      drawMentions(yL+18, 20);
+    }
+
+    return svg;
+  }
+
   function importerLogo(input) {
     const file = input.files[0];
     if (!file) return;
@@ -467,19 +897,22 @@
     };
     reader.readAsDataURL(file);
   }
- 
+
   function afficherLogoPreview(src) {
     const preview = document.getElementById('logoPreview');
     if (preview) preview.innerHTML = `<img src="${src}" alt="Logo"><p>Logo importé ✅</p>`;
   }
- 
+
   function supprimerLogo() {
     localStorage.removeItem('p_logo');
     const preview = document.getElementById('logoPreview');
     if (preview) preview.innerHTML = '<p>📷 Cliquer pour importer un logo (PNG, JPG)</p>';
     showToast('Logo supprimé');
   }
- 
+
+  // ══════════════════════════════════════
+  // FORMULAIRE DEVIS
+  // ══════════════════════════════════════
   function getFormHTML() {
     const p = getProfil();
     return `
@@ -488,6 +921,7 @@
       <input type="text" id="clientNom" placeholder="Nom / raison sociale" oninput="marquerModifie(); effacerErreur(this)">
       <label class="label-champ">Adresse du client</label>
       <input type="text" id="clientAdresse" placeholder="Adresse" oninput="marquerModifie()">
+
       <h2>Prestation</h2>
       <div id="lignes">
         <div class="ligne-prestation">
@@ -509,6 +943,7 @@
       </div>
       <button class="btn-ajouter" onclick="ajouterLigne()">+ Ajouter une ligne</button>
       <div class="total">Total : <span id="totalAffiche">0,00 €</span></div>
+
       <h2>Devis</h2>
       <label class="label-champ">Objet du devis</label>
       <input type="text" id="objetDevis" placeholder="Ex : Rénovation salle de bain" oninput="marquerModifie()">
@@ -526,7 +961,7 @@
       <input type="text" id="validite" value="${p.p_validite || '30 jours'}" oninput="marquerModifie()">
     `;
   }
- 
+
   if (isMobile) {
     document.getElementById('form-content-mobile').innerHTML = getFormHTML();
     document.getElementById('form-profil-mobile').innerHTML = getProfilFormHTML();
@@ -534,20 +969,25 @@
     document.getElementById('form-content-desktop').innerHTML = getFormHTML();
     document.getElementById('form-profil-desktop').innerHTML = getProfilFormHTML();
   }
- 
+
   document.getElementById('dateDevis').valueAsDate = new Date();
   chargerProfil();
   afficherBadgeProfil();
+  rafraichirMiniatures();
+
   const numeroDevisInit = document.getElementById('numeroDevis');
   if (numeroDevisInit && !numeroDevisInit.value) numeroDevisInit.value = genererNumeroDevis();
- 
+
+  // ══════════════════════════════════════
+  // NAVIGATION
+  // ══════════════════════════════════════
   const titres = {
     historique: { title: '📁 Historique', sub: 'Mes devis sauvegardés' },
     formulaire: { title: '📄 DevisApp', sub: 'Nouveau devis' },
     profil: { title: '👤 Mon profil', sub: 'Informations entrepreneur' },
     chat: { title: '🤖 Assistant', sub: 'Génération & questions' }
   };
- 
+
   function changerOnglet(nom) {
     document.querySelectorAll('.mobile-panel').forEach(p => p.classList.remove('actif'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('actif'));
@@ -559,25 +999,28 @@
     }
     if (nom === 'historique') afficherHistoriqueMobile();
   }
- 
+
   function changerTabPC(nom) {
     document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('actif'));
     document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('actif'));
     document.getElementById('pc-tab-' + nom).classList.add('actif');
     document.getElementById('pc-panel-' + nom).classList.add('actif');
   }
- 
+
+  // ══════════════════════════════════════
+  // UTILITAIRES
+  // ══════════════════════════════════════
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
- 
+
   function getErreurEl() {
     return document.getElementById(isMobile ? 'erreurValidation-mobile' : 'erreurValidation-desktop');
   }
- 
+
   function marquerModifie() {
     const ids = isMobile ? ['btnSauvegarderMobile'] : ['btnSauvegarder'];
     ids.forEach(id => {
@@ -585,7 +1028,7 @@
       if (btn) { btn.disabled = false; btn.textContent = '☁️ Sauvegarder'; }
     });
   }
- 
+
   function griserBouton() {
     const ids = isMobile ? ['btnSauvegarderMobile'] : ['btnSauvegarder'];
     ids.forEach(id => {
@@ -593,13 +1036,16 @@
       if (btn) { btn.disabled = true; btn.textContent = '✅ Sauvegardé'; }
     });
   }
- 
+
   function effacerErreur(el) {
     el.classList.remove('erreur');
     const div = getErreurEl();
     if (div) div.style.display = 'none';
   }
- 
+
+  // ══════════════════════════════════════
+  // VALIDATION
+  // ══════════════════════════════════════
   function validerFormulaire() {
     const p = getProfil();
     let erreurs = [];
@@ -628,14 +1074,20 @@
     if (div) div.style.display = 'none';
     return true;
   }
- 
+
+  // ══════════════════════════════════════
+  // NUMÉROTATION AUTO
+  // ══════════════════════════════════════
   function genererNumeroDevis() {
     const annee = new Date().getFullYear();
     const dernierNumero = localStorage.getItem('dernierNumeroDevis') || 0;
     const nouveauNumero = parseInt(dernierNumero) + 1;
     return `${annee}-${String(nouveauNumero).padStart(3, '0')}`;
   }
- 
+
+  // ══════════════════════════════════════
+  // FORMULAIRE
+  // ══════════════════════════════════════
   function nouveauDevis() {
     ['clientNom','clientAdresse','objetDevis'].forEach(id => {
       const el = document.getElementById(id);
@@ -658,7 +1110,7 @@
     showToast('Nouveau devis prêt');
     if (isMobile) changerOnglet('formulaire');
   }
- 
+
   function calculerTotal() {
     let total = 0;
     document.querySelectorAll('.ligne-prestation').forEach(ligne => {
@@ -669,7 +1121,7 @@
     const el = document.getElementById('totalAffiche');
     if (el) el.textContent = total.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €';
   }
- 
+
   function ajouterLigne(desc='', qte=1, pu='') {
     const div = document.createElement('div');
     div.className = 'ligne-prestation';
@@ -695,15 +1147,18 @@
     if (container) container.appendChild(div);
     calculerTotal();
   }
- 
+
   function supprimerLigne(btn) {
     btn.parentElement.remove();
     calculerTotal();
     marquerModifie();
   }
- 
+
+  // ══════════════════════════════════════
+  // HISTORIQUE
+  // ══════════════════════════════════════
   let devisCache = [];
- 
+
   function carteDevisHTML(d, suffixe='') {
     return `
       <div class="devis-card" id="card-${d.id}${suffixe}">
@@ -722,7 +1177,7 @@
       </div>
     `;
   }
- 
+
   async function afficherHistorique() {
     devisCache = await chargerDevis();
     const container = document.getElementById('historiqueDevis');
@@ -733,7 +1188,7 @@
     }
     container.innerHTML = devisCache.map(d => carteDevisHTML(d)).join('');
   }
- 
+
   async function afficherHistoriqueMobile() {
     if (!devisCache || devisCache.length === 0) devisCache = await chargerDevis();
     const container = document.getElementById('historiqueDevisMobile');
@@ -744,7 +1199,7 @@
     }
     container.innerHTML = devisCache.map(d => carteDevisHTML(d, '-m')).join('');
   }
- 
+
   function majSelection(suffixe='') {
     const cases = document.querySelectorAll('.devis-checkbox:checked');
     const btnId = suffixe === '-m' ? 'btnSupprSelectionMobile' : 'btnSupprSelection';
@@ -761,7 +1216,7 @@
       });
     });
   }
- 
+
   async function supprimerSelection() {
     const cases = document.querySelectorAll('.devis-checkbox:checked');
     if (!cases.length) return;
@@ -772,9 +1227,9 @@
     showToast(`🗑️ ${cases.length} devis supprimés`);
     afficherHistorique();
   }
- 
+
   async function supprimerSelectionMobile() { await supprimerSelection(); afficherHistoriqueMobile(); }
- 
+
   async function supprimerUnDevis(id, numero) {
     const confirme = await afficherConfirmation('🗑️ Supprimer', `Supprimer le devis <b>${numero}</b> ?`, 'Supprimer', 'Annuler');
     if (!confirme) return;
@@ -783,7 +1238,7 @@
     showToast('🗑️ Devis supprimé');
     afficherHistorique(); afficherHistoriqueMobile();
   }
- 
+
   async function chargerDevisForm(id) {
     const confirme = await afficherConfirmation('📂 Charger', `Charger ce devis ?<br>Les données actuelles seront remplacées.`, 'Charger', 'Annuler');
     if (!confirme) return;
@@ -798,7 +1253,10 @@
     showToast('📂 Devis chargé');
     if (isMobile) changerOnglet('formulaire');
   }
- 
+
+  // ══════════════════════════════════════
+  // SAUVEGARDE
+  // ══════════════════════════════════════
   async function sauvegarderDevisCloud() {
     if (!validerFormulaire()) return;
     griserBouton();
@@ -829,7 +1287,10 @@
       afficherHistorique(); afficherHistoriqueMobile();
     } else { marquerModifie(); showToast('❌ Erreur lors de la sauvegarde'); }
   }
- 
+
+  // ══════════════════════════════════════
+  // CHAT
+  // ══════════════════════════════════════
   function ajouterMessage(texte, role, estDevis=false, mobile=false) {
     const containerId = mobile ? 'chatMessagesMobile' : 'chatMessages';
     const div = document.createElement('div');
@@ -839,10 +1300,10 @@
     if (container) { container.appendChild(div); container.scrollTop = 9999; }
     return div;
   }
- 
+
   function envoyerExemple(btn) { document.getElementById('chatInput').value = btn.textContent; envoyerChat(); }
   function envoyerExempleMobile(btn) { document.getElementById('chatInputMobile').value = btn.textContent; envoyerChatMobile(); }
- 
+
   async function envoyerChat(mobile=false) {
     const inputId = mobile ? 'chatInputMobile' : 'chatInput';
     const input = document.getElementById(inputId);
@@ -868,9 +1329,9 @@
       ajouterMessage('❌ Erreur de connexion à l\'IA.', 'assistant', false, mobile);
     }
   }
- 
+
   async function envoyerChatMobile() { await envoyerChat(true); }
- 
+
   function appliquerDevis(lignes, mobile=false) {
     const container = document.getElementById('lignes');
     if (container) container.innerHTML = '';
@@ -878,19 +1339,12 @@
     marquerModifie(); showToast('Lignes appliquées');
     if (mobile) changerOnglet('formulaire');
   }
- 
-  // ══════════ PRÉVISUALISATION ══════════
-  function previsualiserDevis() {
+
+  // ══════════════════════════════════════
+  // PRÉVISUALISATION DEVIS
+  // ══════════════════════════════════════
+  function collecterDonnees() {
     const p = getProfil();
-    const couleur = p.couleur || '#1a1a2e';
-    const design = p.design || 'classique';
-    const clientNom = document.getElementById('clientNom').value || 'Client';
-    const clientAdresse = document.getElementById('clientAdresse').value || '';
-    const numeroDevis = document.getElementById('numeroDevis').value || 'DEVIS-001';
-    const objetDevis = document.getElementById('objetDevis').value || '';
-    const dateDevis = document.getElementById('dateDevis').value;
-    const validite = document.getElementById('validite').value || '30 jours';
-    const dateFr = new Date(dateDevis).toLocaleDateString('fr-FR');
     const lignesDOM = document.querySelectorAll('.ligne-prestation');
     let prestations = []; let totalGeneral = 0;
     lignesDOM.forEach(ligne => {
@@ -901,107 +1355,59 @@
       totalGeneral += sousTotal;
       prestations.push({ desc, qte, pu, sousTotal });
     });
-    const lignesHTML = prestations.map(pr => `
-      <tr>
-        <td>${pr.desc}</td>
-        <td style="text-align:center">${pr.qte}</td>
-        <td style="text-align:right">${pr.pu.toLocaleString('fr-FR',{minimumFractionDigits:2})} €</td>
-        <td style="text-align:right">${pr.sousTotal.toLocaleString('fr-FR',{minimumFractionDigits:2})} €</td>
-      </tr>
-    `).join('');
-    let bandeauStyle = design === 'minimaliste'
-      ? 'border-bottom: 2px solid #ddd; background: white; color: #333;'
-      : design === 'corporate'
-      ? `border-left: 6px solid ${couleur}; background: #f8f9fa; color: #333; padding-left: 12px;`
-      : `background: ${couleur};`;
-    const logoHTML = p.logo ? `<img src="${p.logo}" style="max-height:40px;max-width:120px;object-fit:contain;float:right;margin-bottom:8px;">` : '';
-    const apercuHTML = `
-      <div class="apercu-devis">
-        ${logoHTML}
-        <div class="apercu-bandeau" style="${bandeauStyle}">
-          <h2>DEVIS</h2>
-          <span>N° ${numeroDevis}  •  ${dateFr}</span>
-          ${objetDevis ? `<br><span style="font-style:italic">Objet : ${objetDevis}</span>` : ''}
-        </div>
-        <div class="apercu-cols">
-          <div>
-            <div class="apercu-section-title">Prestataire</div>
-            <div class="apercu-nom">${p.p_nom || 'Non renseigné'}</div>
-            <div class="apercu-info">
-              ${p.p_adresse ? p.p_adresse + '<br>' : ''}
-              ${p.p_email ? p.p_email + '<br>' : ''}
-              ${p.p_tel ? p.p_tel + '<br>' : ''}
-              SIRET : ${p.p_siret || 'Non renseigné'}
-            </div>
-          </div>
-          <div>
-            <div class="apercu-section-title">Client</div>
-            <div class="apercu-nom">${clientNom}</div>
-            <div class="apercu-info">${clientAdresse}</div>
-          </div>
-        </div>
-        <table class="apercu-table">
-          <thead>
-            <tr style="background:${couleur}">
-              <th>Désignation</th>
-              <th style="text-align:center">Qté</th>
-              <th style="text-align:right">P.U. HT</th>
-              <th style="text-align:right">Total HT</th>
-            </tr>
-          </thead>
-          <tbody>${lignesHTML}</tbody>
-        </table>
-        <div class="apercu-total" style="background:${couleur}">
-          TOTAL HT : ${totalGeneral.toLocaleString('fr-FR',{minimumFractionDigits:2})} €
-        </div>
-        <div class="apercu-mentions">
-          TVA non applicable — article 293 B du CGI<br>
-          Pas d'escompte pour paiement anticipé.<br>
-          Devis valable ${validite} à compter de sa date d'émission.
-        </div>
-      </div>
-    `;
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.id = 'modalApercu';
-    overlay.innerHTML = `
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>👁️ Aperçu — Style ${design}</h3>
-          <button class="modal-close" onclick="fermerApercu()">✕</button>
-        </div>
-        <div class="modal-body">${apercuHTML}</div>
-        <div class="modal-footer">
-          <button class="btn-modal-cancel" onclick="fermerApercu()">Fermer</button>
-          <button class="btn-modal-dl" onclick="fermerApercu(); genererDevis()">📥 Télécharger PDF</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) fermerApercu(); });
+    const dateDevis = document.getElementById('dateDevis').value;
+    return {
+      monNom: p.p_nom || '', monSiret: p.p_siret || '', monAdresse: p.p_adresse || '',
+      monEmail: p.p_email || '', monTel: p.p_tel || '', monUrssaf: p.p_urssaf || '',
+      clientNom: document.getElementById('clientNom').value,
+      clientAdresse: document.getElementById('clientAdresse').value || '',
+      numeroDevis: document.getElementById('numeroDevis').value,
+      objetDevis: document.getElementById('objetDevis').value || '',
+      dateFr: new Date(dateDevis).toLocaleDateString('fr-FR'),
+      validite: document.getElementById('validite').value || '30 jours',
+      prestations, totalGeneral,
+      couleur: p.couleur || '#1a1a2e',
+      design: p.design || 'classique',
+      logo: p.logo || null,
+    };
   }
- 
+
+  function previsualiserDevis() {
+    if (!validerFormulaire()) return;
+    const d = collecterDonnees();
+    const svg = genererSVGA4(d.design, d.couleur, d);
+    const body = document.getElementById('modalApercuBody');
+    body.innerHTML = '';
+    body.appendChild(svg);
+    document.getElementById('modalApercu').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
   function fermerApercu() {
-    const modal = document.getElementById('modalApercu');
-    if (modal) modal.remove();
+    document.getElementById('modalApercu').style.display = 'none';
+    document.body.style.overflow = '';
   }
- 
-  // ══════════ PDF ══════════
+
+  // ══════════════════════════════════════
+  // PDF — 4 DESIGNS
+  // ══════════════════════════════════════
   function hexToRgb(hex) {
     const r = parseInt(hex.slice(1,3),16);
     const g = parseInt(hex.slice(3,5),16);
     const b = parseInt(hex.slice(5,7),16);
     return [r, g, b];
   }
- 
+
   function genererDevis() {
     if (!validerFormulaire()) return;
     const p = getProfil();
     const design = p.design || 'classique';
     const couleur = p.couleur || '#1a1a2e';
     const [cr, cg, cb] = hexToRgb(couleur);
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+
     const monNom = p.p_nom || '';
     const monSiret = p.p_siret || '';
     const monAdresse = p.p_adresse || '';
@@ -1016,6 +1422,7 @@
     const dateDevis = document.getElementById('dateDevis').value;
     const validite = document.getElementById('validite').value || '30 jours';
     const dateFr = new Date(dateDevis).toLocaleDateString('fr-FR');
+
     const lignesDOM = document.querySelectorAll('.ligne-prestation');
     let prestations = []; let totalGeneral = 0;
     lignesDOM.forEach(ligne => {
@@ -1026,15 +1433,25 @@
       totalGeneral += sousTotal;
       prestations.push({ desc, qte, pu, sousTotal });
     });
-    if (p.logo) { try { doc.addImage(p.logo, 'PNG', 150, 8, 45, 15); } catch(e) {} }
-    const d = { monNom, monSiret, monAdresse, monEmail, monTel, monUrssaf, monMention, clientNom, clientAdresse, numeroDevis, objetDevis, dateFr, validite, prestations, totalGeneral, cr, cg, cb };
-    if (design === 'classique') pdfClassique(doc, d);
-    else if (design === 'moderne') pdfModerne(doc, d);
-    else if (design === 'minimaliste') pdfMinimaliste(doc, d);
-    else if (design === 'corporate') pdfCorporate(doc, d);
+
+    // Logo
+    if (p.logo) {
+      try { doc.addImage(p.logo, 'PNG', 150, 8, 45, 15); } catch(e) {}
+    }
+
+    if (design === 'classique') {
+      pdfClassique(doc, { monNom, monSiret, monAdresse, monEmail, monTel, monUrssaf, monMention, clientNom, clientAdresse, numeroDevis, objetDevis, dateFr, validite, prestations, totalGeneral, cr, cg, cb });
+    } else if (design === 'moderne') {
+      pdfModerne(doc, { monNom, monSiret, monAdresse, monEmail, monTel, monUrssaf, monMention, clientNom, clientAdresse, numeroDevis, objetDevis, dateFr, validite, prestations, totalGeneral, cr, cg, cb });
+    } else if (design === 'minimaliste') {
+      pdfMinimaliste(doc, { monNom, monSiret, monAdresse, monEmail, monTel, monUrssaf, monMention, clientNom, clientAdresse, numeroDevis, objetDevis, dateFr, validite, prestations, totalGeneral });
+    } else if (design === 'corporate') {
+      pdfCorporate(doc, { monNom, monSiret, monAdresse, monEmail, monTel, monUrssaf, monMention, clientNom, clientAdresse, numeroDevis, objetDevis, dateFr, validite, prestations, totalGeneral, cr, cg, cb });
+    }
+
     doc.save(`Devis_${numeroDevis}_${clientNom.replace(/ /g,'_')}.pdf`);
   }
- 
+
   function mentionsLegales(doc, y, validite) {
     doc.setTextColor(100,100,100); doc.setFont('helvetica','italic'); doc.setFontSize(8);
     doc.text('TVA non applicable — article 293 B du CGI', 14, y);
@@ -1048,7 +1465,7 @@
     doc.setFontSize(7); doc.setTextColor(150,150,150);
     doc.text(`Document généré le ${new Date().toLocaleDateString('fr-FR')} — DevisApp`, 14, 285);
   }
- 
+
   function lignesTableau(doc, prestations, y, totalGeneral, cr, cg, cb) {
     doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30); doc.setFontSize(10);
     prestations.forEach((p, i) => {
@@ -1066,7 +1483,7 @@
     doc.text(totalGeneral.toLocaleString('fr-FR',{minimumFractionDigits:2})+' €', 172, y+7);
     return y + 20;
   }
- 
+
   function pdfClassique(doc, d) {
     const { cr, cg, cb } = d;
     doc.setFillColor(cr,cg,cb); doc.rect(0, 0, 210, 28, 'F');
@@ -1099,18 +1516,22 @@
     const yFin = lignesTableau(doc, d.prestations, yTab+14, d.totalGeneral, cr, cg, cb);
     mentionsLegales(doc, yFin, d.validite);
   }
- 
+
   function pdfModerne(doc, d) {
     const { cr, cg, cb } = d;
+    // Bandeau dégradé simulé
     doc.setFillColor(cr,cg,cb); doc.rect(0, 0, 210, 35, 'F');
     doc.setFillColor(Math.min(cr+40,255), Math.min(cg+40,255), Math.min(cb+80,255));
     doc.rect(0, 0, 105, 35, 'F');
     doc.setTextColor(255,255,255); doc.setFontSize(22); doc.setFont('helvetica','bold');
     doc.text('DEVIS', 14, 20);
     doc.setFontSize(10); doc.setFont('helvetica','normal');
-    doc.text(`N° ${d.numeroDevis}`, 14, 28); doc.text(d.dateFr, 160, 28);
+    doc.text(`N° ${d.numeroDevis}`, 14, 28);
+    doc.text(d.dateFr, 160, 28);
     if (d.objetDevis) { doc.setFontSize(9); doc.text(d.objetDevis, 120, 20); }
     doc.setTextColor(30,30,30);
+
+    // Deux colonnes
     doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(cr,cg,cb);
     doc.text('DE', 14, 48);
     doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50); doc.setFontSize(10);
@@ -1120,24 +1541,28 @@
     if (d.monTel) { doc.text(d.monTel, 14, yp); yp+=6; }
     doc.setFontSize(8); doc.setTextColor(120,120,120);
     doc.text(`SIRET : ${d.monSiret}`, 14, yp);
+
     doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(cr,cg,cb);
     doc.text('POUR', 120, 48);
     doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50); doc.setFontSize(10);
     doc.text(d.clientNom, 120, 54);
     if (d.clientAdresse) doc.text(doc.splitTextToSize(d.clientAdresse,75), 120, 60);
+
     const yTab = 90; doc.setFillColor(cr,cg,cb); doc.rect(14, yTab, 182, 8, 'F');
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
     doc.text('DÉSIGNATION', 16, yTab+6); doc.text('QTÉ', 130, yTab+6); doc.text('P.U. HT', 150, yTab+6); doc.text('TOTAL HT', 172, yTab+6);
     const yFin = lignesTableau(doc, d.prestations, yTab+14, d.totalGeneral, cr, cg, cb);
     mentionsLegales(doc, yFin, d.validite);
   }
- 
+
   function pdfMinimaliste(doc, d) {
+    // Juste une ligne fine en haut
     doc.setDrawColor(180,180,180); doc.line(14, 20, 196, 20);
     doc.setFontSize(18); doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50);
     doc.text('devis', 14, 15);
     doc.setFontSize(10); doc.setTextColor(150,150,150);
     doc.text(`N° ${d.numeroDevis}  —  ${d.dateFr}`, 100, 15);
+
     doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50);
     let y = 30;
     doc.text(d.monNom, 14, y); y+=6;
@@ -1145,14 +1570,18 @@
     if (d.monEmail) { doc.text(d.monEmail, 14, y); y+=6; }
     doc.setFontSize(8); doc.setTextColor(150,150,150);
     doc.text(`SIRET : ${d.monSiret}`, 14, y); y+=8;
+
     if (d.objetDevis) { doc.setFontSize(9); doc.setTextColor(100,100,100); doc.text(`Objet : ${d.objetDevis}`, 14, y); y+=6; }
+
     doc.setFontSize(10); doc.setTextColor(50,50,50);
     doc.text(`À l'attention de : ${d.clientNom}`, 120, 30);
     if (d.clientAdresse) doc.text(doc.splitTextToSize(d.clientAdresse,75), 120, 36);
+
     doc.setDrawColor(180,180,180); doc.line(14, y, 196, y); y+=8;
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
     doc.text('DÉSIGNATION', 16, y); doc.text('QTÉ', 130, y); doc.text('P.U. HT', 150, y); doc.text('TOTAL HT', 172, y); y+=6;
     doc.setDrawColor(200,200,200); doc.line(14, y, 196, y); y+=6;
+
     doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50); doc.setFontSize(10);
     d.prestations.forEach((p, i) => {
       const descLignes = doc.splitTextToSize(p.desc, 110);
@@ -1168,16 +1597,21 @@
     doc.text(d.totalGeneral.toLocaleString('fr-FR',{minimumFractionDigits:2})+' €', 172, y);
     mentionsLegales(doc, y+16, d.validite);
   }
- 
+
   function pdfCorporate(doc, d) {
     const { cr, cg, cb } = d;
+    // Barre latérale gauche
     doc.setFillColor(cr,cg,cb); doc.rect(0, 0, 8, 297, 'F');
+    // Header
     doc.setFontSize(22); doc.setFont('helvetica','bold'); doc.setTextColor(cr,cg,cb);
     doc.text('DEVIS', 20, 20);
     doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(100,100,100);
     doc.text(`N° ${d.numeroDevis}  •  ${d.dateFr}`, 20, 28);
     if (d.objetDevis) { doc.setFontSize(9); doc.text(`Objet : ${d.objetDevis}`, 20, 34); }
+
     doc.setDrawColor(cr,cg,cb); doc.line(20, 38, 200, 38);
+
+    // Infos
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(cr,cg,cb);
     doc.text('PRESTATAIRE', 20, 48);
     doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50); doc.setFontSize(10);
@@ -1187,16 +1621,19 @@
     if (d.monTel) { doc.text(d.monTel, 20, yp); yp+=6; }
     doc.setFontSize(8); doc.setTextColor(120,120,120);
     doc.text(`SIRET : ${d.monSiret}`, 20, yp);
+
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(cr,cg,cb);
     doc.text('CLIENT', 120, 48);
     doc.setFont('helvetica','normal'); doc.setTextColor(50,50,50); doc.setFontSize(10);
     doc.text(d.clientNom, 120, 55);
     if (d.clientAdresse) doc.text(doc.splitTextToSize(d.clientAdresse,75), 120, 61);
+
     const yTab = 90;
     doc.setFillColor(240,242,245); doc.rect(20, yTab, 180, 8, 'F');
     doc.setDrawColor(cr,cg,cb); doc.line(20, yTab, 200, yTab);
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(cr,cg,cb);
     doc.text('DÉSIGNATION', 22, yTab+6); doc.text('QTÉ', 132, yTab+6); doc.text('P.U. HT', 152, yTab+6); doc.text('TOTAL HT', 174, yTab+6);
+
     doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30); doc.setFontSize(10);
     let y = yTab+14;
     d.prestations.forEach((p, i) => {
@@ -1214,9 +1651,9 @@
     doc.text(d.totalGeneral.toLocaleString('fr-FR',{minimumFractionDigits:2})+' €', 174, y+7);
     mentionsLegales(doc, y+20, d.validite);
   }
- 
+
   afficherHistorique();
 </script>
- 
+
 </body>
 </html>
