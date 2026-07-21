@@ -44,7 +44,7 @@ Règles :
  
 async function envoyerMessage(messageUtilisateur) {
   historique.push({ role: 'user', content: messageUtilisateur });
-  const reponse = await fetch('/api/chat', {
+  const reponse = await fetch('/api/api-chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages: historique, systemPrompt: getSystemPrompt() })
